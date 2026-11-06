@@ -1,0 +1,380 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #40382f;
+  background: #f8f5ef;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.pagina {
+  max-width: 1100px;
+  margin: auto;
+  padding: 0 35px;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid #e8dfd2;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.icono-libro {
+  font-size: 27px;
+}
+
+.frase-header {
+  color: #968675;
+  font-size: 13px;
+}
+
+.presentacion {
+  padding: 65px 0 35px;
+  max-width: 650px;
+}
+
+.subtitulo, .etiqueta {
+  color: #a47d54;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.presentacion h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(38px, 6vw, 58px);
+  line-height: 1.15;
+  margin: 15px 0;
+  color: #42382d;
+}
+
+.presentacion > p:last-child {
+  color: #82776a;
+  font-size: 15px;
+  line-height: 1.8;
+  max-width: 550px;
+}
+
+.estadisticas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 20px 0 55px;
+}
+
+.estadistica {
+  background: #fffdf9;
+  border: 1px solid #eee6db;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.estadistica > span {
+  font-size: 25px;
+  color: #a47d54;
+}
+
+.estadistica strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 27px;
+}
+
+.estadistica p {
+  margin: 3px 0 0;
+  color: #948779;
+  font-size: 12px;
+}
+
+.formulario-seccion, .biblioteca {
+  margin-bottom: 60px;
+}
+
+.titulo-seccion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.titulo-seccion h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 29px;
+  margin: 7px 0 0;
+  color: #42382d;
+}
+
+.formulario {
+  background: #fffdf9;
+  padding: 28px;
+  border: 1px solid #eee6db;
+  border-radius: 14px;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.campos label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #65594c;
+}
+
+.campos input, .campos select {
+  width: 100%;
+  border: 1px solid #e8dfd2;
+  background: #faf8f3;
+  border-radius: 8px;
+  padding: 13px;
+  color: #40382f;
+  outline: none;
+}
+
+.campos input:focus, .campos select:focus, .buscador:focus {
+  border-color: #ad8a63;
+}
+
+.acciones-formulario {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.boton-principal {
+  background: #78634e;
+  color: white;
+  border: none;
+  padding: 13px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.boton-principal:hover {
+  background: #5e4b39;
+}
+
+.boton-secundario {
+  background: #eee8de;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 18px;
+  color: #65594c;
+}
+
+.mensaje {
+  color: #66805c;
+  font-size: 13px;
+  margin-bottom: 0;
+}
+
+.cantidad {
+  color: #948779;
+  font-size: 13px;
+}
+
+.buscador {
+  width: 100%;
+  background: #fffdf9;
+  border: 1px solid #eee6db;
+  border-radius: 9px;
+  padding: 15px;
+  outline: none;
+  margin-bottom: 18px;
+}
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filtro {
+  border: 1px solid #e5dbce;
+  background: transparent;
+  color: #82776a;
+  border-radius: 25px;
+  padding: 9px 18px;
+  font-size: 13px;
+}
+
+.filtro.activo {
+  background: #78634e;
+  border-color: #78634e;
+  color: white;
+}
+
+.lista-libros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.tarjeta-libro {
+  display: flex;
+  gap: 17px;
+  background: #fffdf9;
+  border: 1px solid #eee6db;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.portada {
+  min-width: 85px;
+  height: 120px;
+  background: #e9dfd0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31px;
+}
+
+.datos-libro {
+  min-width: 0;
+}
+
+.estado {
+  font-size: 10px;
+  padding: 5px 9px;
+  border-radius: 20px;
+}
+
+.estado.leido {
+  background: #e7eee2;
+  color: #627c58;
+}
+
+.estado.pendiente {
+  background: #f4eadb;
+  color: #a17a4d;
+}
+
+.datos-libro h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  margin: 12px 0 5px;
+  overflow-wrap: anywhere;
+}
+
+.datos-libro p {
+  font-size: 12px;
+  color: #82776a;
+  margin: 0 0 7px;
+}
+
+.datos-libro small {
+  color: #a18f7b;
+  font-size: 11px;
+}
+
+.acciones-libro {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.acciones-libro button {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #90714f;
+  font-size: 11px;
+  text-decoration: underline;
+}
+
+.vacio {
+  color: #948779;
+  padding: 30px 0;
+  font-size: 14px;
+  grid-column: 1 / -1;
+}
+
+footer {
+  border-top: 1px solid #e8dfd2;
+  padding: 25px 0;
+  display: flex;
+  justify-content: space-between;
+  color: #948779;
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .pagina {
+    padding: 0 18px;
+  }
+
+  .frase-header {
+    display: none;
+  }
+
+  .estadisticas {
+    gap: 8px;
+  }
+
+  .estadistica {
+    padding: 12px 8px;
+    gap: 7px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .estadistica strong {
+    font-size: 22px;
+  }
+
+  .estadistica p {
+    font-size: 10px;
+  }
+
+  .campos, .lista-libros {
+    grid-template-columns: 1fr;
+  }
+
+  .formulario {
+    padding: 18px;
+  }
+
+  footer {
+    gap: 10px;
+    flex-direction: column;
+  }
+}
