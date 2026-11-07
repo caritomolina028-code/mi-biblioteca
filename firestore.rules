@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Colección "libros": cada documento es un libro de un usuario.
+    match /libros/{libroId} {
+
+      // Revisa que los datos del libro sean válidos
+      function datosValidos(libro) {
+        return libro.titulo is string && libro.titulo.size() > 0 && libro.titulo.size() <= 100
+          && libro.autor is string && libro.autor.size() > 0 && libro.autor.size() <= 100
+          && libro.genero is string && libro.genero.size() <= 50
+          && libro.estado in ['Leído', 'Quiero leer'];
+      }
+
+      // CONSULTAR y ELIMINAR: solo el dueño del libro
+      allow read, delete: if request.auth != null
+        && resource.data.ownerId == request.auth.uid;
+
+      // AGREGAR: con sesión, a nombre propio y con datos válidos
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid
+        && datosValidos(request.resource.data);
+
+      // MODIFICAR: solo el dueño, sin cambiar el dueño y con datos válidos
+      allow update: if request.auth != null
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && datosValidos(request.resource.data);
+    }
+
+    // Cualquier otra colección queda bloqueada (no hay ninguna regla que la permita).
+  }
+}

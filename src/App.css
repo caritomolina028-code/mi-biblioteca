@@ -199,9 +199,30 @@ button {
 }
 
 .mensaje {
-  color: #66805c;
   font-size: 13px;
-  margin-bottom: 0;
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.mensaje.exito {
+  background: #e7eee2;
+  color: #4f6846;
+}
+
+.mensaje.error {
+  background: #f7e3df;
+  color: #9a3b2c;
+}
+
+.boton-principal:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:focus-visible {
+  outline: 2px solid #ad8a63;
+  outline-offset: 2px;
 }
 
 .cantidad {

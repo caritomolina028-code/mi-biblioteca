@@ -1,158 +1,129 @@
-
 import { useState, useEffect } from 'react'
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
+import { auth } from './firebase'
 import {
-  collection,
-  onSnapshot,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc
-} from 'firebase/firestore'
-import { db } from './firebase'
+  escucharLibros,
+  agregarLibro,
+  actualizarLibro,
+  eliminarLibro,
+} from './librosService'
+import Estadisticas from './components/Estadisticas'
+import FormularioLibro from './components/FormularioLibro'
+import TarjetaLibro from './components/TarjetaLibro'
 import './App.css'
 
-const librosIniciales = [
-  {
-    id: 1,
-    titulo: 'La biblioteca de la medianoche',
-    autor: 'Matt Haig',
-    genero: 'Ficción',
-    estado: 'Leído',
-  },
-  {
-    id: 2,
-    titulo: 'Hábitos atómicos',
-    autor: 'James Clear',
-    genero: 'Desarrollo personal',
-    estado: 'Quiero leer',
-  },
-  {
-    id: 3,
-    titulo: 'El principito',
-    autor: 'Antoine de Saint-Exupéry',
-    genero: 'Clásico',
-    estado: 'Leído',
-  },
-]
-
 function App() {
+  // Estado de la app
+  const [usuario, setUsuario] = useState(null)
   const [libros, setLibros] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const [libroEditando, setLibroEditando] = useState(null)
   const [filtro, setFiltro] = useState('Todos')
-  const [titulo, setTitulo] = useState('')
-  const [autor, setAutor] = useState('')
-  const [genero, setGenero] = useState('')
-  const [estado, setEstado] = useState('Quiero leer')
   const [busqueda, setBusqueda] = useState('')
-  const [editando, setEditando] = useState(null)
-  const [mensaje, setMensaje] = useState('')
+  // mensaje = { texto, tipo } donde tipo es 'exito' o 'error'
+  const [mensaje, setMensaje] = useState(null)
 
+  // 1) Inicio de sesión anónimo: cada navegador recibe un usuario propio (uid)
   useEffect(() => {
-  const cancelar = onSnapshot(collection(db, 'libros'), (snapshot) => {
-    const librosFirebase = snapshot.docs.map((documento) => ({
-      id: documento.id,
-      ...documento.data()
-    }))
+    const cancelar = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUsuario(user)
+      } else {
+        try {
+          await signInAnonymously(auth)
+        } catch (error) {
+          console.error(error)
+          setCargando(false)
+          setMensaje({ texto: 'No se pudo conectar. Revisá tu conexión y recargá la página.', tipo: 'error' })
+        }
+      }
+    })
+    return () => cancelar()
+  }, [])
 
-    setLibros(librosFirebase)
-  })
+  // 2) CONSULTAR: cuando hay usuario, escuchamos sus libros en Firestore
+  useEffect(() => {
+    if (!usuario) return
 
-  return () => cancelar()
-}, [])
+    const cancelar = escucharLibros(
+      usuario.uid,
+      (librosFirebase) => {
+        setLibros(librosFirebase)
+        setCargando(false)
+      },
+      (error) => {
+        console.error(error)
+        setCargando(false)
+        setMensaje({ texto: 'No se pudieron cargar tus libros. Recargá la página.', tipo: 'error' })
+      }
+    )
+    return () => cancelar()
+  }, [usuario])
 
-  const librosFiltrados = libros.filter((libro) => {
-    const coincideFiltro =
-      filtro === 'Todos' || libro.estado === filtro
-
-    const coincideBusqueda =
-      libro.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      libro.autor.toLowerCase().includes(busqueda.toLowerCase())
-
-    return coincideFiltro && coincideBusqueda
-  })
-
-  async function guardarLibro(e) {
-  e.preventDefault()
-
-  if (!titulo.trim() || !autor.trim()) {
-    setMensaje('Completá el título y el autor.')
-    return
-  }
-
-  const datosLibro = {
-    titulo,
-    autor,
-    genero: genero || 'Sin categoría',
-    estado,
-  }
-
-  try {
-    if (editando !== null) {
-      await updateDoc(doc(db, 'libros', editando), datosLibro)
-
-      setMensaje('¡Libro actualizado correctamente!')
-      setEditando(null)
-    } else {
-      await addDoc(collection(db, 'libros'), datosLibro)
-
-      setMensaje('¡Libro agregado a tu biblioteca!')
+  // AGREGAR o MODIFICAR (según si estamos editando)
+  async function guardarLibro(datosLibro) {
+    try {
+      if (libroEditando) {
+        await actualizarLibro(libroEditando.id, datosLibro)
+        setMensaje({ texto: '¡Libro actualizado correctamente!', tipo: 'exito' })
+        setLibroEditando(null)
+      } else {
+        await agregarLibro(usuario.uid, datosLibro)
+        setMensaje({ texto: '¡Libro agregado a tu biblioteca!', tipo: 'exito' })
+      }
+      return true
+    } catch (error) {
+      console.error(error)
+      setMensaje({ texto: 'No se pudo guardar el libro. Intentá de nuevo.', tipo: 'error' })
+      return false
     }
-
-    setTitulo('')
-    setAutor('')
-    setGenero('')
-    setEstado('Quiero leer')
-
-  } catch (error) {
-    console.error('Error al guardar el libro:', error)
-    setMensaje('No se pudo guardar el libro.')
   }
-}
 
-  function editarLibro(libro) {
-    setTitulo(libro.titulo)
-    setAutor(libro.autor)
-    setGenero(libro.genero)
-    setEstado(libro.estado)
-    setEditando(libro.id)
+  // MODIFICAR solo el estado (Leído / Quiero leer)
+  async function cambiarEstado(libro) {
+    const nuevoEstado = libro.estado === 'Leído' ? 'Quiero leer' : 'Leído'
+    try {
+      await actualizarLibro(libro.id, { estado: nuevoEstado })
+      setMensaje({ texto: `Marcado como "${nuevoEstado}".`, tipo: 'exito' })
+    } catch (error) {
+      console.error(error)
+      setMensaje({ texto: 'No se pudo actualizar el estado.', tipo: 'error' })
+    }
+  }
+
+  // ELIMINAR
+  async function borrarLibro(libro) {
+    if (!window.confirm(`¿Querés eliminar "${libro.titulo}"?`)) return
+    try {
+      await eliminarLibro(libro.id)
+      setMensaje({ texto: 'Libro eliminado correctamente.', tipo: 'exito' })
+    } catch (error) {
+      console.error(error)
+      setMensaje({ texto: 'No se pudo eliminar el libro.', tipo: 'error' })
+    }
+  }
+
+  function empezarEdicion(libro) {
+    setLibroEditando(libro)
+    setMensaje(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  async function eliminarLibro(id) {
-  if (window.confirm('¿Querés eliminar este libro?')) {
-    try {
-      await deleteDoc(doc(db, 'libros', id))
-      setMensaje('Libro eliminado correctamente.')
-    } catch (error) {
-      console.error('Error al eliminar:', error)
-      setMensaje('No se pudo eliminar el libro.')
-    }
-  }
-}
-
-  async function cambiarEstado(libro) {
-  const nuevoEstado =
-    libro.estado === 'Leído' ? 'Quiero leer' : 'Leído'
-
-  try {
-    await updateDoc(doc(db, 'libros', libro.id), {
-      estado: nuevoEstado
-    })
-
-    setMensaje('¡Estado del libro actualizado!')
-  } catch (error) {
-    console.error('Error al cambiar estado:', error)
-    setMensaje('No se pudo actualizar el estado.')
-  }
-}
-
-  const leidos = libros.filter((libro) => libro.estado === 'Leído').length
-  const pendientes = libros.filter((libro) => libro.estado === 'Quiero leer').length
+  // Filtro por estado + búsqueda por título o autor (se hace en el navegador)
+  const textoBuscado = busqueda.toLowerCase()
+  const librosFiltrados = libros.filter((libro) => {
+    const coincideFiltro = filtro === 'Todos' || libro.estado === filtro
+    const coincideBusqueda =
+      libro.titulo.toLowerCase().includes(textoBuscado) ||
+      libro.autor.toLowerCase().includes(textoBuscado)
+    return coincideFiltro && coincideBusqueda
+  })
 
   return (
     <main className="pagina">
       <header className="encabezado">
         <div className="marca">
-          <span className="icono-libro">📖</span>
+          <span className="icono-libro" aria-hidden="true">📖</span>
           <span>mi biblioteca</span>
         </div>
         <span className="frase-header">Un mundo entre páginas</span>
@@ -164,108 +135,31 @@ function App() {
         <p>Un lugar para guardar cada historia que te acompaña y cada aventura que está por comenzar.</p>
       </section>
 
-      <section className="estadisticas">
-        <div className="estadistica">
-          <span>📚</span>
-          <div>
-            <strong>{libros.length}</strong>
-            <p>Libros en total</p>
-          </div>
-        </div>
-
-        <div className="estadistica">
-          <span>✓</span>
-          <div>
-            <strong>{leidos}</strong>
-            <p>Libros leídos</p>
-          </div>
-        </div>
-
-        <div className="estadistica">
-          <span>♡</span>
-          <div>
-            <strong>{pendientes}</strong>
-            <p>Por leer</p>
-          </div>
-        </div>
-      </section>
+      <Estadisticas libros={libros} />
 
       <section className="formulario-seccion">
         <div className="titulo-seccion">
           <div>
             <span className="etiqueta">TU COLECCIÓN</span>
-            <h2>{editando ? 'Editar libro' : 'Agregar un libro'}</h2>
+            <h2>{libroEditando ? 'Editar libro' : 'Agregar un libro'}</h2>
           </div>
         </div>
 
-        <form onSubmit={guardarLibro} className="formulario">
-          <div className="campos">
-            <label>
-              Título del libro *
-              <input
-                type="text"
-                placeholder="Ej: El principito"
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-              />
-            </label>
+        <FormularioLibro
+          // key: al cambiar de libro, el formulario se reinicia con sus datos
+          key={libroEditando ? libroEditando.id : 'nuevo'}
+          libroEditando={libroEditando}
+          deshabilitado={!usuario}
+          onGuardar={guardarLibro}
+          onCancelar={() => setLibroEditando(null)}
+          onError={(texto) => setMensaje({ texto, tipo: 'error' })}
+        />
 
-            <label>
-              Autor *
-              <input
-                type="text"
-                placeholder="Nombre del autor"
-                value={autor}
-                onChange={(e) => setAutor(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Género
-              <input
-                type="text"
-                placeholder="Ej: Novela, romance..."
-                value={genero}
-                onChange={(e) => setGenero(e.target.value)}
-              />
-            </label>
-
-            <label>
-              Estado de lectura
-              <select
-                value={estado}
-                onChange={(e) => setEstado(e.target.value)}
-              >
-                <option value="Quiero leer">Quiero leer</option>
-                <option value="Leído">Leído</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="acciones-formulario">
-            <button type="submit" className="boton-principal">
-              {editando ? 'Guardar cambios' : '+ Agregar libro'}
-            </button>
-
-            {editando !== null && (
-              <button
-                type="button"
-                className="boton-secundario"
-                onClick={() => {
-                  setEditando(null)
-                  setTitulo('')
-                  setAutor('')
-                  setGenero('')
-                  setEstado('Quiero leer')
-                }}
-              >
-                Cancelar
-              </button>
-            )}
-          </div>
-
-          {mensaje && <p className="mensaje">{mensaje}</p>}
-        </form>
+        {mensaje && (
+          <p className={`mensaje ${mensaje.tipo}`} role="status">
+            {mensaje.texto}
+          </p>
+        )}
       </section>
 
       <section className="biblioteca">
@@ -281,6 +175,7 @@ function App() {
           className="buscador"
           type="search"
           placeholder="⌕ Buscar por título o autor..."
+          aria-label="Buscar por título o autor"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
@@ -298,36 +193,23 @@ function App() {
         </div>
 
         <div className="lista-libros">
-          {librosFiltrados.length === 0 ? (
-            <p className="vacio">Todavía no hay libros en esta sección. ¡Agregá tu primera lectura!</p>
+          {cargando ? (
+            <p className="vacio">Cargando tu biblioteca...</p>
+          ) : librosFiltrados.length === 0 ? (
+            <p className="vacio">
+              {libros.length === 0
+                ? 'Todavía no hay libros. ¡Agregá tu primera lectura!'
+                : 'No hay libros que coincidan con la búsqueda o el filtro.'}
+            </p>
           ) : (
             librosFiltrados.map((libro) => (
-              <article className="tarjeta-libro" key={libro.id}>
-                <div className="portada">
-                  <span>📖</span>
-                </div>
-
-                <div className="datos-libro">
-                  <span className={libro.estado === 'Leído' ? 'estado leido' : 'estado pendiente'}>
-                    {libro.estado}
-                  </span>
-                  <h3>{libro.titulo}</h3>
-                  <p>{libro.autor}</p>
-                  <small>{libro.genero}</small>
-
-                  <div className="acciones-libro">
-                    <button onClick={() => cambiarEstado(libro)}>
-                      Cambiar estado
-                    </button>
-                    <button onClick={() => editarLibro(libro)}>
-                      Editar
-                    </button>
-                    <button onClick={() => eliminarLibro(libro.id)}>
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              </article>
+              <TarjetaLibro
+                key={libro.id}
+                libro={libro}
+                onCambiarEstado={cambiarEstado}
+                onEditar={empezarEdicion}
+                onEliminar={borrarLibro}
+              />
             ))
           )}
         </div>

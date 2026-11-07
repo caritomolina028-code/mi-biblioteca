@@ -1,16 +1,92 @@
-# React + Vite
+# Mi biblioteca
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web para registrar los libros que leíste y los que querés leer. Podés agregar libros, marcarlos como leídos o pendientes, editarlos, eliminarlos, buscarlos y filtrarlos.
 
-Currently, two official plugins are available:
+- **App publicada:** [completar con la URL de Vercel]
+- **Tecnologías:** React + Vite, Firebase (Cloud Firestore y Authentication anónima), Vercel.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Cómo usarla
 
-## React Compiler
+1. Completá título y autor (obligatorios), género y estado, y tocá **Agregar libro**.
+2. En cada tarjeta podés **marcar como leído / pendiente**, **editar** o **eliminar**.
+3. Usá el buscador y los filtros para encontrar un libro.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Cada navegador recibe un usuario anónimo propio: tus libros se guardan en Firebase y siguen ahí al recargar, pero desde otro dispositivo verías una biblioteca distinta.
 
-## Expanding the ESLint configuration
+## Instalación local
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Necesitás Node.js instalado.
+
+```bash
+npm install
+npm run dev
+```
+
+### Configurar Firebase
+
+1. En [Firebase Console](https://console.firebase.google.com/) creá un proyecto y registrá una app web (`</>`).
+2. En **Authentication → Método de acceso**, habilitá **Anónimo**.
+3. Creá una base de **Cloud Firestore** (edición Standard, `(default)`, región `southamerica-east1`) en **modo producción**.
+4. Copiá `.env.example` como `.env` y completá los valores del objeto `firebaseConfig`:
+
+```
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+5. Reiniciá `npm run dev` después de cambiar el `.env`.
+
+### Publicar las reglas de Firestore
+
+Las reglas están en `firestore.rules`. Copiá su contenido en **Firestore → Reglas** y tocá **Publicar**. Publicar en Vercel **no** actualiza las reglas.
+
+## Publicar en Vercel
+
+1. Importá el repositorio de GitHub en [Vercel](https://vercel.com/).
+2. Framework: **Vite**, build: `npm run build`, salida: `dist`.
+3. En **Settings → Environment Variables** cargá las 4 variables `VITE_FIREBASE_*` (entorno Production).
+4. Desplegá. Si cambiás las variables, hacé **Redeploy**.
+
+## Dónde se conecta Firebase
+
+| Archivo | Qué hace |
+|---|---|
+| `src/firebase.js` | Inicializa Firebase con las variables del `.env` y exporta `db` y `auth`. |
+| `src/App.jsx` | Inicia la sesión anónima (`signInAnonymously`). |
+| `src/librosService.js` | Todas las operaciones con Firestore: consultar (`onSnapshot`), agregar (`addDoc`), modificar (`updateDoc`) y eliminar (`deleteDoc`). |
+| `firestore.rules` | Permisos de la base de datos. |
+
+## Modelo de datos
+
+Colección `libros`, un documento por libro:
+
+| Campo | Tipo | Ejemplo |
+|---|---|---|
+| `titulo` | texto (1 a 100) | "El principito" |
+| `autor` | texto (1 a 100) | "Antoine de Saint-Exupéry" |
+| `genero` | texto (hasta 50) | "Clásico" |
+| `estado` | "Leído" o "Quiero leer" | "Leído" |
+| `ownerId` | texto | uid del usuario anónimo |
+
+## Seguridad
+
+- Cada usuario solo puede ver, modificar y eliminar sus propios libros.
+- Las reglas validan los campos y no permiten cambiar el dueño de un libro.
+- Todo lo que no está permitido queda bloqueado.
+- El `.env` no se sube al repositorio.
+
+## Estructura
+
+```
+src/
+  firebase.js          conexión con Firebase
+  librosService.js     operaciones con Firestore
+  App.jsx              estado principal y lógica
+  components/
+    Estadisticas.jsx   contadores de libros
+    FormularioLibro.jsx  formulario para agregar/editar
+    TarjetaLibro.jsx   tarjeta de cada libro
+firestore.rules        reglas de seguridad
+```
