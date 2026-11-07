@@ -2,7 +2,7 @@
 
 Aplicación web para registrar los libros que leíste y los que querés leer. Podés agregar libros, marcarlos como leídos o pendientes, editarlos, eliminarlos, buscarlos y filtrarlos.
 
-- **App publicada:** [completar con la URL de Vercel]
+- **App publicada:** https://mi-biblioteca-zeta.vercel.app/
 - **Tecnologías:** React + Vite, Firebase (Cloud Firestore y Authentication anónima), Vercel.
 
 ## Cómo usarla
