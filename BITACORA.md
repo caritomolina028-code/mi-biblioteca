@@ -100,9 +100,9 @@ En el celular:
 
 **Uso de IA:** usé Claude para aplicar los cambios. Le mandé las imágenes de inspiración (el fondo de acuarela, la ilustración de libros y la hoja) y le expliqué lo que quería en cada paso. Por ejemplo: *"Quiero sacar el botón de agregar el libro y que en la parte de estado de lectura estén dos botones, uno de 'Quiero leer' y otro de 'Leído', para que no se hagan tantos pasos."* Revisé cada cambio en mi compu con `npm run dev` antes de subirlo.
 
-**Pruebas:** [completar después de probar la versión publicada]
+**Pruebas:** primero revisé cada cambio en mi compu con `npm run dev` (localhost). Después, en la URL publicada, agregué varios libros con los botones "Quiero leer" y "Leído", y comprobé que los contadores de "Mi colección" filtraran bien la lista.
 
-**Verificación en Vercel:** [completar]
+**Verificación en Vercel:** subí los cambios a GitHub (commit "version3") y Vercel hizo un despliegue nuevo automáticamente. Al abrir https://mi-biblioteca-zeta.vercel.app/ ya se veía el diseño verde con la hoja, y agregar libros funcionó. **Dificultad:** al principio me confundí entre el link de localhost (la app corriendo solo en mi compu, para probar) y el de Vercel (la app publicada, que es la que se entrega).
 
 **Capturas:**
 
