@@ -96,4 +96,4 @@ firestore.rules        reglas de seguridad
 
 ## Imágenes
 
-Los íconos de la hoja y de los libros se hicieron a partir de ilustraciones de acuarela usadas como referencia: se recortaron y se les quitó el fondo. Fuente: [completar de dónde salieron las imágenes].
+Los íconos de la hoja y de los libros se hicieron a partir de ilustraciones de acuarela usadas como referencia: se recortaron y se les quitó el fondo. Fuente: imágenes encontradas en Pinterest, usadas solo como referencia e inspiración para este trabajo práctico (el fondo de acuarela verde se recreó con CSS).

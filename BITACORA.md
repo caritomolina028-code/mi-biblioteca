@@ -82,7 +82,7 @@ En el celular:
 
 *Diseño*
 - Nueva paleta en **verde acuarela**, en lugar de beige y marrón. Me inspiré en una imagen de fondo de acuarela verde que encontré. El fondo se hizo con CSS (manchas verdes suaves con degradados y puntitos blancos), sin usar la imagen, para que el diseño sea propio y la página cargue más rápido.
-- En un primer momento pensé en un fondo con flores, pero lo descarté: las flores llamaban mucho la atención y la página se iba a ver más recargada y menos "de libros". La acuarela verde mantiene la idea de algo sobrio y tranquilo.
+- Las imágenes de inspiración las saqué de Pinterest. En un primer momento pensé en un fondo con flores, pero lo descarté: las flores llamaban mucho la atención y la página se iba a ver más recargada y menos "de libros". La acuarela verde mantiene la idea de algo sobrio y tranquilo.
 - Los colores quedaron ordenados en **variables CSS** (`--principal`, `--fondo`, `--texto`, etc.) al principio de `App.css`.
 - Las tarjetas son un poco transparentes, así se ve la acuarela por detrás.
 - **Logo:** una **hoja** de otoño reemplaza el ícono de libro, y el nombre pasó a ser "Mi biblioteca", con M mayúscula. La hoja también es el ícono de la pestaña del navegador (favicon).
@@ -104,4 +104,12 @@ En el celular:
 
 **Verificación en Vercel:** [completar]
 
-**Capturas:** [agregar]
+**Capturas:**
+
+"Agregar un libro" como primera sección, con los botones "Quiero leer" y "Leído":
+
+![Versión 3, inicio con el formulario](docs/capturas/v3-inicio-formulario.png)
+
+"Mi colección" con los contadores como filtros ("Libros en total" seleccionado):
+
+![Versión 3, colección](docs/capturas/v3-coleccion.png)
