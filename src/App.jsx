@@ -10,6 +10,7 @@ import {
 import Estadisticas from './components/Estadisticas'
 import FormularioLibro from './components/FormularioLibro'
 import TarjetaLibro from './components/TarjetaLibro'
+import hoja from './assets/hoja.png'
 import './App.css'
 
 function App() {
@@ -123,8 +124,8 @@ function App() {
     <main className="pagina">
       <header className="encabezado">
         <div className="marca">
-          <span className="icono-libro" aria-hidden="true">📖</span>
-          <span>mi biblioteca</span>
+          <img src={hoja} alt="" className="icono-marca" width="36" height="36" />
+          <span>Mi biblioteca</span>
         </div>
         <span className="frase-header">Un mundo entre páginas</span>
       </header>
@@ -132,10 +133,8 @@ function App() {
       <section className="presentacion">
         <p className="subtitulo">TU ESPACIO DE LECTURA</p>
         <h1>Mis libros, mi historia.</h1>
-        <p>Un lugar para guardar cada historia que te acompaña y cada aventura que está por comenzar.</p>
+        <p>Guardá cada historia que te acompaña y cada aventura que está por comenzar.</p>
       </section>
-
-      <Estadisticas libros={libros} />
 
       <section className="formulario-seccion">
         <div className="titulo-seccion">
@@ -168,8 +167,13 @@ function App() {
             <span className="etiqueta">TUS HISTORIAS FAVORITAS</span>
             <h2>Mi colección</h2>
           </div>
-          <span className="cantidad">{libros.length} libros</span>
+          <span className="cantidad">
+            {libros.length} {libros.length === 1 ? 'libro' : 'libros'}
+          </span>
         </div>
+
+        {/* Los íconos con el conteo también funcionan como filtros */}
+        <Estadisticas libros={libros} filtro={filtro} onCambiarFiltro={setFiltro} />
 
         <input
           className="buscador"
@@ -179,18 +183,6 @@ function App() {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-
-        <div className="filtros">
-          {['Todos', 'Leído', 'Quiero leer'].map((opcion) => (
-            <button
-              key={opcion}
-              className={filtro === opcion ? 'filtro activo' : 'filtro'}
-              onClick={() => setFiltro(opcion)}
-            >
-              {opcion}
-            </button>
-          ))}
-        </div>
 
         <div className="lista-libros">
           {cargando ? (

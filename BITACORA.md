@@ -78,10 +78,30 @@ En el celular:
 
 ## Versión 3 – Versión final
 
-**Qué cambió:** [completar]
+**Qué cambió**
 
-**Por qué:** [completar]
+*Diseño*
+- Nueva paleta en **verde acuarela**, en lugar de beige y marrón. Me inspiré en una imagen de fondo de acuarela verde que encontré. El fondo se hizo con CSS (manchas verdes suaves con degradados y puntitos blancos), sin usar la imagen, para que el diseño sea propio y la página cargue más rápido.
+- En un primer momento pensé en un fondo con flores, pero lo descarté: las flores llamaban mucho la atención y la página se iba a ver más recargada y menos "de libros". La acuarela verde mantiene la idea de algo sobrio y tranquilo.
+- Los colores quedaron ordenados en **variables CSS** (`--principal`, `--fondo`, `--texto`, etc.) al principio de `App.css`.
+- Las tarjetas son un poco transparentes, así se ve la acuarela por detrás.
+- **Logo:** una **hoja** de otoño reemplaza el ícono de libro, y el nombre pasó a ser "Mi biblioteca", con M mayúscula. La hoja también es el ícono de la pestaña del navegador (favicon).
+- **Íconos de acuarela** para los contadores: una pila de 3 libros (total), 2 libros con un tilde verde (leídos) y 2 libros con un marcador (por leer). Salen de una misma ilustración de libros en acuarela, para que los tres tengan la misma estética. Se les sacó el fondo blanco para que se integren con el fondo verde.
+- Los tonos cálidos de los libros y la hoja contrastan con el verde, como un libro sobre el pasto en otoño.
 
-**Pruebas y verificación en Vercel:** [completar]
+*Funciones y experiencia de uso*
+- **"Agregar un libro" es lo primero que se ve:** se achicó la presentación de arriba.
+- **Agregar en un solo paso:** se sacaron el desplegable de estado y el botón "Agregar libro". Ahora hay dos botones, **Quiero leer** y **Leído**, que guardan el libro directamente con ese estado. Tienen los mismos colores que las etiquetas de estado de las tarjetas.
+- **Los contadores se movieron a "Mi colección" y ahora son botones:** al tocar "Libros en total", "Libros leídos" o "Por leer", la lista muestra solo esos libros. Por eso se sacaron los botones de filtro "Todos / Leído / Quiero leer", que hacían lo mismo.
+- En el celular los contadores son más compactos (ícono arriba, número y texto abajo).
+- Se corrigió "1 libros" → "1 libro".
+
+**Por qué:** quería que agregar un libro llevara menos pasos y que la página fuera más ordenada, sin elementos repetidos. El cambio de colores le da una identidad propia, más tranquila, que acompaña la idea de un espacio de lectura.
+
+**Uso de IA:** usé Claude para aplicar los cambios. Le mandé las imágenes de inspiración (el fondo de acuarela, la ilustración de libros y la hoja) y le expliqué lo que quería en cada paso. Por ejemplo: *"Quiero sacar el botón de agregar el libro y que en la parte de estado de lectura estén dos botones, uno de 'Quiero leer' y otro de 'Leído', para que no se hagan tantos pasos."* Revisé cada cambio en mi compu con `npm run dev` antes de subirlo.
+
+**Pruebas:** [completar después de probar la versión publicada]
+
+**Verificación en Vercel:** [completar]
 
 **Capturas:** [agregar]

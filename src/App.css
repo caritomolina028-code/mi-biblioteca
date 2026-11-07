@@ -2,10 +2,48 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
 :root {
+  /* Paleta de la versión 3: verde acuarela, inspirada en una imagen de referencia */
+  --fondo: #f2f6ef;
+  --texto: #2f3b33;
+  --titulo: #2a382e;
+  --texto-medio: #46554a;
+  --texto-suave: #4f5e53;
+  --acento: #456549;
+  --principal: #4a6b4f;
+  --principal-hover: #3a5640;
+  --enlace: #44664a;
+  --borde: #d9e5d3;
+  --tarjeta: rgba(255, 255, 255, 0.8);
+  --campo: #f7faf5;
+  --secundario: #e4eee0;
+  --portada: #dfeada;
+
   font-family: 'DM Sans', sans-serif;
-  color: #40382f;
-  background: #f8f5ef;
+  color: var(--texto);
+  background: var(--fondo);
   font-synthesis: none;
+}
+
+/* Fondo tipo acuarela: manchas verdes suaves y puntitos blancos.
+   Está en una capa fija detrás de todo, así no se mueve al hacer scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 92% 6%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 12%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 96% 18%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 5% 82%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
+    radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 3% 95%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(ellipse 45% 35% at 95% 5%, rgba(150, 190, 140, 0.45), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 15% 20%, rgba(185, 214, 175, 0.4), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 0% 95%, rgba(140, 185, 130, 0.45), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 75% 65%, rgba(195, 222, 185, 0.4), transparent 70%),
+    var(--fondo);
 }
 
 * {
@@ -36,7 +74,7 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 28px 0;
-  border-bottom: 1px solid #e8dfd2;
+  border-bottom: 1px solid var(--borde);
 }
 
 .marca {
@@ -48,22 +86,24 @@ button {
   font-weight: 700;
 }
 
-.icono-libro {
-  font-size: 27px;
+.icono-marca {
+  width: 36px;
+  height: 36px;
 }
 
 .frase-header {
-  color: #968675;
+  color: var(--texto-suave);
   font-size: 13px;
 }
 
+/* Presentación corta, para que "Agregar un libro" se vea apenas se entra */
 .presentacion {
-  padding: 65px 0 35px;
+  padding: 32px 0 20px;
   max-width: 650px;
 }
 
 .subtitulo, .etiqueta {
-  color: #a47d54;
+  color: var(--acento);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -71,39 +111,63 @@ button {
 
 .presentacion h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(38px, 6vw, 58px);
+  font-size: clamp(30px, 4.5vw, 42px);
   line-height: 1.15;
-  margin: 15px 0;
-  color: #42382d;
+  margin: 10px 0 8px;
+  color: var(--titulo);
 }
 
 .presentacion > p:last-child {
-  color: #82776a;
+  color: var(--texto-suave);
   font-size: 15px;
-  line-height: 1.8;
+  line-height: 1.6;
   max-width: 550px;
+  margin: 0;
 }
 
+/* Estadísticas: ahora son botones que filtran la colección */
 .estadisticas {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  margin: 20px 0 55px;
+  margin-bottom: 20px;
 }
 
 .estadistica {
-  background: #fffdf9;
-  border: 1px solid #eee6db;
+  background: var(--tarjeta);
+  border: 2px solid var(--borde);
   border-radius: 12px;
-  padding: 22px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
+  text-align: left;
+  color: var(--texto);
+  transition: border-color 0.2s, background 0.2s;
 }
 
 .estadistica > span {
-  font-size: 25px;
-  color: #a47d54;
+  display: flex;
+  flex-direction: column;
+}
+
+/* La opción elegida queda marcada en verde */
+.estadistica.activa {
+  border-color: var(--principal);
+  background: var(--secundario);
+}
+
+@media (hover: hover) {
+  .estadistica:hover {
+    border-color: var(--principal);
+  }
+}
+
+/* Íconos de acuarela de las estadísticas */
+.estadistica > img {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
 }
 
 .estadistica strong {
@@ -111,9 +175,9 @@ button {
   font-size: 27px;
 }
 
-.estadistica p {
-  margin: 3px 0 0;
-  color: #948779;
+.estadistica-texto {
+  margin-top: 3px;
+  color: var(--texto-suave);
   font-size: 12px;
 }
 
@@ -132,13 +196,13 @@ button {
   font-family: 'Playfair Display', serif;
   font-size: 29px;
   margin: 7px 0 0;
-  color: #42382d;
+  color: var(--titulo);
 }
 
 .formulario {
-  background: #fffdf9;
+  background: var(--tarjeta);
   padding: 28px;
-  border: 1px solid #eee6db;
+  border: 1px solid var(--borde);
   border-radius: 14px;
 }
 
@@ -154,21 +218,80 @@ button {
   gap: 9px;
   font-size: 13px;
   font-weight: 600;
-  color: #65594c;
+  color: var(--texto-medio);
 }
 
 .campos input, .campos select {
   width: 100%;
-  border: 1px solid #e8dfd2;
-  background: #faf8f3;
+  border: 1px solid var(--borde);
+  background: var(--campo);
   border-radius: 8px;
   padding: 13px;
-  color: #40382f;
+  color: var(--texto);
   outline: none;
 }
 
 .campos input:focus, .campos select:focus, .buscador:focus {
-  border-color: #ad8a63;
+  border-color: var(--principal);
+}
+
+/* Dos botones que guardan el libro directamente con su estado */
+.campo-estado {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.campo-estado-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-medio);
+}
+
+.botones-estado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.boton-estado {
+  min-height: 46px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid transparent;
+}
+
+/* Mismos colores que las etiquetas de estado de las tarjetas */
+.boton-estado.quiero-leer {
+  background: #f4eadb;
+  border-color: #e3cfb3;
+  color: #7a5a33;
+}
+
+.boton-estado.leido {
+  background: var(--principal);
+  color: white;
+}
+
+@media (hover: hover) {
+  .boton-estado.quiero-leer:hover {
+    border-color: #b8925f;
+  }
+
+  .boton-estado.leido:hover {
+    background: var(--principal-hover);
+  }
+}
+
+.boton-estado:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.guardando {
+  margin: 14px 0 0;
+  font-size: 13px;
+  color: var(--texto-suave);
 }
 
 .acciones-formulario {
@@ -177,25 +300,12 @@ button {
   margin-top: 22px;
 }
 
-.boton-principal {
-  background: #78634e;
-  color: white;
-  border: none;
-  padding: 13px 22px;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.boton-principal:hover {
-  background: #5e4b39;
-}
-
 .boton-secundario {
-  background: #eee8de;
+  background: var(--secundario);
   border: none;
   border-radius: 8px;
   padding: 13px 18px;
-  color: #65594c;
+  color: var(--texto-medio);
 }
 
 .mensaje {
@@ -215,51 +325,24 @@ button {
   color: #9a3b2c;
 }
 
-.boton-principal:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 button:focus-visible {
-  outline: 2px solid #ad8a63;
+  outline: 2px solid var(--principal);
   outline-offset: 2px;
 }
 
 .cantidad {
-  color: #948779;
+  color: var(--texto-suave);
   font-size: 13px;
 }
 
 .buscador {
   width: 100%;
-  background: #fffdf9;
-  border: 1px solid #eee6db;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
   border-radius: 9px;
   padding: 15px;
   outline: none;
-  margin-bottom: 18px;
-}
-
-.filtros {
-  display: flex;
-  gap: 10px;
   margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
-.filtro {
-  border: 1px solid #e5dbce;
-  background: transparent;
-  color: #82776a;
-  border-radius: 25px;
-  padding: 9px 18px;
-  font-size: 13px;
-}
-
-.filtro.activo {
-  background: #78634e;
-  border-color: #78634e;
-  color: white;
 }
 
 .lista-libros {
@@ -271,8 +354,8 @@ button:focus-visible {
 .tarjeta-libro {
   display: flex;
   gap: 17px;
-  background: #fffdf9;
-  border: 1px solid #eee6db;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
   border-radius: 12px;
   padding: 18px;
 }
@@ -280,7 +363,7 @@ button:focus-visible {
 .portada {
   min-width: 85px;
   height: 120px;
-  background: #e9dfd0;
+  background: var(--portada);
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -317,12 +400,12 @@ button:focus-visible {
 
 .datos-libro p {
   font-size: 12px;
-  color: #82776a;
+  color: var(--texto-suave);
   margin: 0 0 7px;
 }
 
 .datos-libro small {
-  color: #a18f7b;
+  color: var(--texto-suave);
   font-size: 11px;
 }
 
@@ -337,24 +420,24 @@ button:focus-visible {
   border: none;
   background: none;
   padding: 0;
-  color: #90714f;
+  color: var(--enlace);
   font-size: 11px;
   text-decoration: underline;
 }
 
 .vacio {
-  color: #948779;
+  color: var(--texto-suave);
   padding: 30px 0;
   font-size: 14px;
   grid-column: 1 / -1;
 }
 
 footer {
-  border-top: 1px solid #e8dfd2;
+  border-top: 1px solid var(--borde);
   padding: 25px 0;
   display: flex;
   justify-content: space-between;
-  color: #948779;
+  color: var(--texto-suave);
   font-size: 12px;
 }
 
@@ -367,23 +450,34 @@ footer {
     display: none;
   }
 
+  /* Estadísticas compactas: ícono arriba, número y texto abajo */
   .estadisticas {
     gap: 8px;
+    margin-bottom: 16px;
   }
 
   .estadistica {
-    padding: 12px 8px;
-    gap: 7px;
     flex-direction: column;
-    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 4px;
+    text-align: center;
+  }
+
+  .estadistica > span {
+    align-items: center;
+  }
+
+  .estadistica > img {
+    width: 38px;
+    height: 38px;
   }
 
   .estadistica strong {
     font-size: 22px;
   }
 
-  .estadistica p {
-    font-size: 10px;
+  .estadistica-texto {
+    font-size: 11px;
   }
 
   .campos, .lista-libros {

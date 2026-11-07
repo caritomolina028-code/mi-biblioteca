@@ -1,17 +1,15 @@
 import { useState } from 'react'
 
 // Formulario para agregar o editar un libro.
-// Si recibe "libroEditando", arranca con los datos de ese libro.
+// En lugar de un select + botón "Agregar", hay dos botones:
+// "Quiero leer" y "Leído". Tocar uno guarda el libro con ese estado (un solo paso).
 function FormularioLibro({ libroEditando, deshabilitado, onGuardar, onCancelar, onError }) {
   const [titulo, setTitulo] = useState(libroEditando?.titulo ?? '')
   const [autor, setAutor] = useState(libroEditando?.autor ?? '')
   const [genero, setGenero] = useState(libroEditando?.genero ?? '')
-  const [estado, setEstado] = useState(libroEditando?.estado ?? 'Quiero leer')
   const [guardando, setGuardando] = useState(false)
 
-  async function manejarEnvio(e) {
-    e.preventDefault()
-
+  async function guardar(estado) {
     // Validación básica
     if (!titulo.trim() || !autor.trim()) {
       onError('Completá el título y el autor.')
@@ -32,12 +30,13 @@ function FormularioLibro({ libroEditando, deshabilitado, onGuardar, onCancelar, 
       setTitulo('')
       setAutor('')
       setGenero('')
-      setEstado('Quiero leer')
     }
   }
 
+  const bloqueado = guardando || deshabilitado
+
   return (
-    <form onSubmit={manejarEnvio} className="formulario">
+    <form onSubmit={(e) => e.preventDefault()} className="formulario">
       <div className="campos">
         <label>
           Título del libro *
@@ -72,26 +71,40 @@ function FormularioLibro({ libroEditando, deshabilitado, onGuardar, onCancelar, 
           />
         </label>
 
-        <label>
-          Estado de lectura
-          <select value={estado} onChange={(e) => setEstado(e.target.value)}>
-            <option value="Quiero leer">Quiero leer</option>
-            <option value="Leído">Leído</option>
-          </select>
-        </label>
+        <div className="campo-estado">
+          <span className="campo-estado-titulo">
+            {libroEditando ? 'Guardar como' : 'Agregar como'}
+          </span>
+          <div className="botones-estado">
+            <button
+              type="button"
+              className="boton-estado quiero-leer"
+              disabled={bloqueado}
+              onClick={() => guardar('Quiero leer')}
+            >
+              Quiero leer
+            </button>
+            <button
+              type="button"
+              className="boton-estado leido"
+              disabled={bloqueado}
+              onClick={() => guardar('Leído')}
+            >
+              Leído
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="acciones-formulario">
-        <button type="submit" className="boton-principal" disabled={guardando || deshabilitado}>
-          {guardando ? 'Guardando...' : libroEditando ? 'Guardar cambios' : '+ Agregar libro'}
-        </button>
+      {guardando && <p className="guardando">Guardando...</p>}
 
-        {libroEditando && (
+      {libroEditando && (
+        <div className="acciones-formulario">
           <button type="button" className="boton-secundario" onClick={onCancelar}>
-            Cancelar
+            Cancelar edición
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </form>
   )
 }

@@ -7,9 +7,10 @@ Aplicación web para registrar los libros que leíste y los que querés leer. Po
 
 ## Cómo usarla
 
-1. Completá título y autor (obligatorios), género y estado, y tocá **Agregar libro**.
-2. En cada tarjeta podés **marcar como leído / pendiente**, **editar** o **eliminar**.
-3. Usá el buscador y los filtros para encontrar un libro.
+1. Completá título y autor (obligatorios) y, si querés, el género.
+2. Tocá **Quiero leer** o **Leído**: el libro se guarda directamente con ese estado.
+3. En **Mi colección**, tocá los contadores (**Libros en total**, **Libros leídos**, **Por leer**) para ver solo esos libros. También podés usar el buscador.
+4. En cada tarjeta podés **marcar como leído / pendiente**, **editar** o **eliminar**.
 
 Cada navegador recibe un usuario anónimo propio: tus libros se guardan en Firebase y siguen ahí al recargar, pero desde otro dispositivo verías una biblioteca distinta.
 
@@ -84,9 +85,15 @@ src/
   firebase.js          conexión con Firebase
   librosService.js     operaciones con Firestore
   App.jsx              estado principal y lógica
+  assets/              íconos de acuarela (hoja y libros)
   components/
-    Estadisticas.jsx   contadores de libros
+    Estadisticas.jsx   contadores de libros (también filtran la colección)
     FormularioLibro.jsx  formulario para agregar/editar
     TarjetaLibro.jsx   tarjeta de cada libro
+docs/capturas/         capturas de cada versión
 firestore.rules        reglas de seguridad
 ```
+
+## Imágenes
+
+Los íconos de la hoja y de los libros se hicieron a partir de ilustraciones de acuarela usadas como referencia: se recortaron y se les quitó el fondo. Fuente: [completar de dónde salieron las imágenes].
