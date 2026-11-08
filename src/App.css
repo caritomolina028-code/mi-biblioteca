@@ -423,9 +423,15 @@ button {
   color: #4f6846;
 }
 
-.mensaje.error {
+.mensaje.error,
+.mensaje.eliminado {
   background: #f7e3df;
   color: #9a3b2c;
+}
+
+/* El mensaje de la colección queda entre el buscador y la lista */
+.biblioteca .mensaje {
+  margin: 0 0 18px;
 }
 
 button:focus-visible {

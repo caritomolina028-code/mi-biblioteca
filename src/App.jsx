@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth'
 import { auth } from './firebase'
 import {
@@ -25,7 +25,21 @@ function App() {
   const [filtro, setFiltro] = useState('Todos')
   const [busqueda, setBusqueda] = useState('')
   // mensaje = { texto, tipo } donde tipo es 'exito' o 'error'
+  // "mensaje" se muestra arriba, junto al formulario (agregar / editar)
   const [mensaje, setMensaje] = useState(null)
+  // "mensajeColeccion" se muestra abajo, en "Mi colección" (eliminar / cambiar estado)
+  const [mensajeColeccion, setMensajeColeccion] = useState(null)
+  const temporizadorMensaje = useRef(null)
+
+  // Muestra un mensaje en la colección y lo oculta solo después de 4 segundos
+  function avisarEnColeccion(texto, tipo) {
+    clearTimeout(temporizadorMensaje.current)
+    setMensajeColeccion({ texto, tipo })
+    temporizadorMensaje.current = setTimeout(() => setMensajeColeccion(null), 4000)
+  }
+
+  // Al cerrar la app, cancelamos el temporizador del mensaje
+  useEffect(() => () => clearTimeout(temporizadorMensaje.current), [])
 
   // 1) Inicio de sesión anónimo: cada navegador recibe un usuario propio (uid)
   useEffect(() => {
@@ -88,10 +102,10 @@ function App() {
     const nuevoEstado = libro.estado === 'Leído' ? 'Quiero leer' : 'Leído'
     try {
       await actualizarLibro(libro.id, { estado: nuevoEstado })
-      setMensaje({ texto: `Marcado como "${nuevoEstado}".`, tipo: 'exito' })
+      avisarEnColeccion(`Marcado como "${nuevoEstado}".`, 'exito')
     } catch (error) {
       console.error(error)
-      setMensaje({ texto: 'No se pudo actualizar el estado.', tipo: 'error' })
+      avisarEnColeccion('No se pudo actualizar el estado.', 'error')
     }
   }
 
@@ -100,10 +114,11 @@ function App() {
     if (!window.confirm(`¿Querés eliminar "${libro.titulo}"?`)) return
     try {
       await eliminarLibro(libro.id)
-      setMensaje({ texto: 'Libro eliminado correctamente.', tipo: 'exito' })
+      // En rojo, para que se note que el libro se borró
+      avisarEnColeccion(`"${libro.titulo}" se eliminó de tu colección.`, 'eliminado')
     } catch (error) {
       console.error(error)
-      setMensaje({ texto: 'No se pudo eliminar el libro.', tipo: 'error' })
+      avisarEnColeccion('No se pudo eliminar el libro.', 'error')
     }
   }
 
@@ -186,6 +201,12 @@ function App() {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
+
+        {mensajeColeccion && (
+          <p className={`mensaje ${mensajeColeccion.tipo}`} role="status">
+            {mensajeColeccion.texto}
+          </p>
+        )}
 
         <div className="lista-libros">
           {cargando ? (
