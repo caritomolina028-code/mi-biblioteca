@@ -24,7 +24,7 @@
 
 **Dificultades:** con los usuarios anónimos, cada vez que entraba se creaba un usuario nuevo, pero todos veían los mismos libros. Me costó encontrar el problema y hubo que hacer muchos cambios. Con ayuda de Claude se resolvió en la versión 2: cada libro guarda el usuario dueño (`ownerId`), la app solo consulta los libros de ese usuario y las reglas de Firestore lo exigen.
 
-**Capturas:** [agregar capturas en docs/capturas/v1-...png]
+**Capturas:** no guardé capturas de esta versión. El código de la versión 1 se puede ver en el historial de GitHub, en el commit "version1".
 
 ---
 
@@ -151,9 +151,9 @@ En el celular:
 
 **Uso de IA:** usé Claude para comparar las APIs, crear la clave paso a paso y programar las funciones. Le pedí, por ejemplo: *"El profesor me pidió usar una API sobre libros. ¿Cómo puedo llegar a usar una API? ¿Qué funciones podríamos sumar?"*. Elegí las tres ideas propuestas (buscador, portadas y "Ver más"). También le marqué el problema de la búsqueda al borrar letras, y lo corregimos juntas.
 
-**Pruebas:** [completar]
+**Pruebas:** primero probé en mi compu (localhost) buscando distintos libros: *El principito*, *A sangre fría*, *Los siete maridos de Evelyn Hugo* (también borrando letras al final), *La sombra* de John Katzenbach y *El cuerpo del delito* de Patricia Cornwell (usando también el autor). Comprobé que se completaran el autor, el género y la portada, que la portada apareciera en la tarjeta y que "Ver más" mostrara la sinopsis. También probé un libro cuya edición no tiene sinopsis en Google Books, y la app lo avisa sin romperse.
 
-**Verificación en Vercel:** [completar]
+**Verificación en Vercel:** publiqué las reglas nuevas en Firebase, cargué la clave en las variables de entorno de Vercel (`VITE_GOOGLE_BOOKS_API_KEY`, tipo Config; Vercel avisa que una variable con `VITE_` queda visible en el navegador, y la marqué como segura porque la clave tiene restricciones) y subí los cambios con el commit "version4". En https://mi-biblioteca-zeta.vercel.app/ el buscador, las portadas y "Ver más" funcionaron igual que en mi compu.
 
 **Capturas:**
 
