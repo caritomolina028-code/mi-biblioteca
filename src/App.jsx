@@ -10,6 +10,7 @@ import {
 import Estadisticas from './components/Estadisticas'
 import FormularioLibro from './components/FormularioLibro'
 import TarjetaLibro from './components/TarjetaLibro'
+import DetalleLibro from './components/DetalleLibro'
 import hoja from './assets/hoja.png'
 import './App.css'
 
@@ -19,6 +20,8 @@ function App() {
   const [libros, setLibros] = useState([])
   const [cargando, setCargando] = useState(true)
   const [libroEditando, setLibroEditando] = useState(null)
+  // Libro del que se muestra la ventana "Ver más" (null = cerrada)
+  const [libroDetalle, setLibroDetalle] = useState(null)
   const [filtro, setFiltro] = useState('Todos')
   const [busqueda, setBusqueda] = useState('')
   // mensaje = { texto, tipo } donde tipo es 'exito' o 'error'
@@ -201,11 +204,16 @@ function App() {
                 onCambiarEstado={cambiarEstado}
                 onEditar={empezarEdicion}
                 onEliminar={borrarLibro}
+                onVerDetalle={setLibroDetalle}
               />
             ))
           )}
         </div>
       </section>
+
+      {libroDetalle && (
+        <DetalleLibro libro={libroDetalle} onCerrar={() => setLibroDetalle(null)} />
+      )}
 
       <footer>
         <p>Hecho con ♡ para los amantes de los libros.</p>

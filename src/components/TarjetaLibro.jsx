@@ -1,11 +1,16 @@
 // Tarjeta de un libro con sus acciones. Las funciones llegan por props desde App.
-function TarjetaLibro({ libro, onCambiarEstado, onEditar, onEliminar }) {
+function TarjetaLibro({ libro, onCambiarEstado, onEditar, onEliminar, onVerDetalle }) {
   const esLeido = libro.estado === 'Leído'
 
   return (
     <article className="tarjeta-libro">
-      <div className="portada" aria-hidden="true">
-        <span>📖</span>
+      <div className="portada">
+        {/* Si el libro tiene portada de Google Books la mostramos; si no, el ícono */}
+        {libro.portada ? (
+          <img src={libro.portada} alt={`Portada de ${libro.titulo}`} loading="lazy" />
+        ) : (
+          <span aria-hidden="true">📖</span>
+        )}
       </div>
 
       <div className="datos-libro">
@@ -17,6 +22,10 @@ function TarjetaLibro({ libro, onCambiarEstado, onEditar, onEliminar }) {
         <small>{libro.genero}</small>
 
         <div className="acciones-libro">
+          {/* "Ver más" solo aparece si el libro vino de Google Books */}
+          {libro.googleId && (
+            <button onClick={() => onVerDetalle(libro)}>Ver más</button>
+          )}
           <button onClick={() => onCambiarEstado(libro)}>
             {esLeido ? 'Marcar como pendiente' : 'Marcar como leído'}
           </button>

@@ -113,3 +113,53 @@ En el celular:
 "Mi colección" con los contadores como filtros ("Libros en total" seleccionado):
 
 ![Versión 3, colección](docs/capturas/v3-coleccion.png)
+
+---
+
+## Versión 4 – API de libros (Google Books)
+
+**Por qué:** en la corrección, el profesor me pidió sumar una API de libros, en lo posible en español.
+
+**Qué se agregó**
+- **Buscador al escribir el título:** mientras se escribe, la app busca en **Google Books** y muestra una lista de libros con su portada. Al elegir uno, se completan solos el título, el autor y el género. Así se escribe menos y hay menos pasos.
+- **Portadas reales:** si el libro se eligió de la lista, la tarjeta muestra su tapa. Si se cargó a mano, sigue apareciendo el ícono 📖.
+- **"Ver más":** en los libros que vienen de Google Books, un botón abre una ventana con la sinopsis, el año, la editorial y la cantidad de páginas. Estos datos se piden a la API en el momento.
+- Toda la comunicación con la API está en `src/googleBooks.js` y usa `fetch`. La respuesta llega en formato JSON. Mientras busca se muestra "Buscando...", y si algo falla aparece un mensaje y se puede completar el libro a mano.
+- **Reglas de Firestore actualizadas:** aceptan los dos campos nuevos (`portada` y `googleId`), validan que la portada sea una dirección `https://` y no permiten agregar otros campos.
+
+**Elección de la API**
+- Antes de programar hice una **prueba mínima** desde la app publicada. **Google Books sin clave** respondió *"Quota exceeded"* (error 429): sin clave propia se comparte un cupo diario con todos los usuarios, y ya estaba agotado.
+- **Open Library** sí respondió sin clave, pero algunos libros venían con el título en inglés ("In Cold Blood" en lugar de "A sangre fría") y casi sin sinopsis.
+- Elegí **Google Books con una clave propia (API key)**. Es gratis, tiene un cupo de 1000 búsquedas por día para la app y no requiere tarjeta. La creé en Google Cloud dentro del mismo proyecto de Firebase, con dos restricciones de seguridad:
+  - solo sirve para la **Books API**;
+  - solo funciona desde mi página de Vercel y desde mi compu (`localhost`).
+- La clave se guarda en `.env` como `VITE_GOOGLE_BOOKS_API_KEY` (no se sube a GitHub) y se cargó también en las variables de entorno de Vercel.
+
+**Dificultad: los resultados de la búsqueda**
+- **Problema:** al escribir una palabra a medias, aparecían resultados que no tenían nada que ver. Por ejemplo, con "el princi" aparecían libros antiguos escaneados del siglo XVIII. Y con *Los siete maridos de Evelyn Hugo*, al borrar la última letra ("Hug") la lista empeoraba y el libro correcto dejaba de aparecer arriba.
+- **Causa:** Google Books busca **palabras completas**, así que "princi" o "hug" no las reconoce como el comienzo de "principito" o "Hugo". Además, al principio la lista mostraba **primero los libros con portada**, y eso mandaba al fondo al libro correcto cuando no tenía tapa.
+- **Solución:**
+  - Se limpian los resultados: se sacan los que no tienen autor, los repetidos y los publicados antes de 1900 (suelen ser documentos antiguos escaneados).
+  - Se ordena la lista según **cuánto se parece el título a lo escrito**. Para la última palabra, que puede estar a medio escribir, alcanza con que una palabra del título empiece con ella ("hug" cuenta para "Hugo"). La portada solo se usa para desempatar.
+  - La búsqueda espera a que se deje de escribir un momento antes de consultar la API (así se gastan menos búsquedas del cupo).
+  - El texto de ayuda del campo dice *"Escribí el título y elegí tu libro"*. Si no hay resultados, aparece: *"No encontramos ese libro. Probá con el título completo o completalo a mano."*
+- **Libros con títulos muy parecidos:** al buscar *La sombra* de John Katzenbach o *El cuerpo del delito* de Patricia Cornwell, la lista se llenaba de otros libros con títulos parecidos y el que buscaba no aparecía. **Solución:** ahora el campo **Autor** también se usa para buscar. Si se escribe el autor (al menos 3 letras), la app le pide a Google que el autor coincida (`inauthor:`). Así, "La sombra" + "katzenbach" encuentra el libro enseguida. Si con ese autor no aparece nada (por ejemplo, porque está mal escrito), se busca solo por título. Al final de la lista se agregó la ayuda *"¿No está tu libro? Escribí también el autor"*.
+- **Géneros en español:** Google Books devuelve los géneros en inglés ("Fiction", "True Crime", "Biography & Autobiography"). Se agregó una lista de traducciones en `src/googleBooks.js` (por ejemplo, "Fiction" → "Ficción", "True Crime" → "Crimen real"). Si el género viene como "Fiction / Romance / General", se usa la parte más específica ("Romance"). Si un género no está en la lista, el campo queda vacío para escribirlo a mano. Además, muchas ediciones vienen **sin género** en la búsqueda. En ese caso, al elegir el libro la app pide el detalle a la API, que suele traer géneros más completos. Si Google directamente no tiene el género cargado para esa edición, el campo queda vacío. Esto depende de los datos de Google: por ejemplo, una edición de *A sangre fría* figura como "Drama".
+- **Limitación que queda:** con una sola palabra a medio escribir (por ejemplo "el princi") Google Books no encuentra el libro, porque no completa palabras sueltas. Escribiendo la palabra completa funciona bien, y siempre se puede cargar el libro a mano.
+
+**Uso de IA:** usé Claude para comparar las APIs, crear la clave paso a paso y programar las funciones. Le pedí, por ejemplo: *"El profesor me pidió usar una API sobre libros. ¿Cómo puedo llegar a usar una API? ¿Qué funciones podríamos sumar?"*. Elegí las tres ideas propuestas (buscador, portadas y "Ver más"). También le marqué el problema de la búsqueda al borrar letras, y lo corregimos juntas.
+
+**Pruebas:** [completar]
+
+**Verificación en Vercel:** [completar]
+
+**Capturas:**
+
+"Ver más" de *El cuerpo del delito* (Patricia Cornwell), con la portada, los datos y la sinopsis que trae la API:
+
+![Ver más con sinopsis](docs/capturas/v4-ver-mas-sinopsis.png)
+
+"Ver más" de *La sombra* (John Katzenbach): esa edición no tiene sinopsis en Google Books, y la app lo avisa en lugar de mostrar un error:
+
+![Ver más sin sinopsis](docs/capturas/v4-ver-mas-sin-sinopsis.png)
+

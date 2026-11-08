@@ -8,10 +8,16 @@ service cloud.firestore {
 
       // Revisa que los datos del libro sean válidos
       function datosValidos(libro) {
-        return libro.titulo is string && libro.titulo.size() > 0 && libro.titulo.size() <= 100
+        // Solo se permiten estos campos (no se pueden agregar otros)
+        return libro.keys().hasOnly(['titulo', 'autor', 'genero', 'estado', 'ownerId', 'portada', 'googleId'])
+          && libro.titulo is string && libro.titulo.size() > 0 && libro.titulo.size() <= 100
           && libro.autor is string && libro.autor.size() > 0 && libro.autor.size() <= 100
           && libro.genero is string && libro.genero.size() <= 50
-          && libro.estado in ['Leído', 'Quiero leer'];
+          && libro.estado in ['Leído', 'Quiero leer']
+          // portada y googleId vienen de Google Books y son opcionales
+          && (!('portada' in libro) || (libro.portada is string && libro.portada.size() <= 1000
+              && (libro.portada == '' || libro.portada.matches('https://.*'))))
+          && (!('googleId' in libro) || (libro.googleId is string && libro.googleId.size() <= 40));
       }
 
       // CONSULTAR y ELIMINAR: solo el dueño del libro
