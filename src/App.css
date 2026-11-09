@@ -550,6 +550,70 @@ button:focus-visible {
   grid-column: 1 / -1;
 }
 
+/* ---------- Paginación de "Mi colección" (de a 6 libros) ---------- */
+.biblioteca {
+  /* deja un poco de aire arriba al volver a la colección */
+  scroll-margin-top: 20px;
+}
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.paginacion-numeros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.paginacion-numero,
+.paginacion-flecha {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto-medio);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.paginacion-numero {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 8px;
+}
+
+.paginacion-flecha {
+  height: 38px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+/* La página que se está viendo queda en verde, igual que el filtro elegido */
+.paginacion-numero.activa {
+  background: var(--principal);
+  border-color: var(--principal);
+  color: #fff;
+  font-weight: 600;
+}
+
+.paginacion-flecha:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .paginacion-numero:not(.activa):hover,
+  .paginacion-flecha:not(:disabled):hover {
+    border-color: var(--principal);
+  }
+}
+
 footer {
   border-top: 1px solid var(--borde);
   padding: 25px 0;
@@ -604,6 +668,16 @@ footer {
 
   .formulario {
     padding: 18px;
+  }
+
+  /* En el celular: números arriba, "Anterior" y "Siguiente" abajo, a los costados */
+  .paginacion {
+    justify-content: space-between;
+  }
+
+  .paginacion-numeros {
+    order: -1;
+    width: 100%;
   }
 
   footer {

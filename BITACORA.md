@@ -165,3 +165,33 @@ En el celular:
 
 ![Ver más sin sinopsis](docs/capturas/v4-ver-mas-sin-sinopsis.png)
 
+
+---
+
+## Versión 5 – Paginación de la colección
+
+**Por qué:** después de cargar 11 o 12 libros, la página se hacía cada vez más larga y había que bajar mucho para llegar al final de la colección. Con el uso real de la app la lista iba a seguir creciendo.
+
+**Qué cambió**
+- **"Mi colección" muestra de a 6 libros por página**, con los botones **← Anterior**, los **números de página** y **Siguiente →**. Si hay 6 libros o menos, los botones no aparecen.
+- **La paginación respeta el filtro y la búsqueda:** si se toca "Libros leídos" o "Por leer", o se escribe en el buscador, las páginas se arman solo con esos libros, y la vista vuelve a la página 1.
+- **Los libros se ordenan alfabéticamente por título**, así cada libro queda siempre en la misma página y es más fácil encontrarlo.
+- Al cambiar de página, la vista sube al principio de "Mi colección".
+- Si se elimina el último libro de la última página, la app pasa sola a la página anterior en lugar de quedar en una página vacía.
+- **Diseño:** la página que se está viendo queda marcada en verde, igual que el contador elegido, para que se entienda que funcionan de la misma manera. En el celular, los números quedan arriba y "Anterior" y "Siguiente" abajo, a los costados, para que se puedan tocar con el dedo.
+- El código de los botones quedó en un componente nuevo, `src/components/Paginacion.jsx`; la lógica (qué libros van en cada página) está en `src/App.jsx`. No hizo falta cambiar Firestore ni las reglas: la paginación se hace en el navegador con los libros que ya se consultan.
+
+**Uso de IA:** le pedí a Claude: *"Ahora sumé varios libros, pero la hoja se sigue haciendo cada vez más larga. ¿Es posible hacer varias páginas de los libros? Que muestre de a 6 libros por cada filtro."* Claude programó la paginación y la probó con 12 libros de prueba: 6 por página, cambio de filtro y búsqueda, eliminación en la última página y vista en celular.
+
+**Pruebas**
+- [ ] En mi compu (`npm run dev`), con mis libros cargados: aparecen las páginas de a 6 y los botones funcionan.
+- [ ] Los contadores ("Libros en total", "Libros leídos", "Por leer") y el buscador muestran las páginas correctas.
+- [ ] En la URL de Vercel, después del commit "version5", la paginación funciona igual.
+- [ ] En el celular, los botones se ven y se pueden tocar bien.
+
+**Video:** además, al mini video le sumé una sección al principio, "Así era el diseño anterior", con capturas que había tomado de la versión beige y marrón (versiones 1 y 2), en computadora y celular, para que se vea la evolución del diseño.
+
+**Capturas:**
+
+<!-- Agregar una captura de la colección con los botones de página, por ejemplo: -->
+<!-- ![Versión 5, paginación](docs/capturas/v5-paginacion.png) -->

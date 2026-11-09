@@ -7,7 +7,7 @@
 - **App (Vercel):** https://mi-biblioteca-zeta.vercel.app/
 - **Repositorio (GitHub):** https://github.com/caritomolina028-code/mi-biblioteca
 - **Bitácora:** BITACORA.md en el repositorio
-- **Mini video:** [completar]
+- **Mini video:** https://www.youtube.com/watch?v=R722E3pPGxY
 
 ## Idea y público
 

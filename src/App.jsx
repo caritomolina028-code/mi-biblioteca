@@ -11,8 +11,12 @@ import Estadisticas from './components/Estadisticas'
 import FormularioLibro from './components/FormularioLibro'
 import TarjetaLibro from './components/TarjetaLibro'
 import DetalleLibro from './components/DetalleLibro'
+import Paginacion from './components/Paginacion'
 import hoja from './assets/hoja.png'
 import './App.css'
+
+// Cantidad de libros que se muestran en cada página de "Mi colección"
+const LIBROS_POR_PAGINA = 6
 
 function App() {
   // Estado de la app
@@ -24,6 +28,10 @@ function App() {
   const [libroDetalle, setLibroDetalle] = useState(null)
   const [filtro, setFiltro] = useState('Todos')
   const [busqueda, setBusqueda] = useState('')
+  // Página de "Mi colección" que se está viendo (empieza en 1)
+  const [pagina, setPagina] = useState(1)
+  // Referencia a "Mi colección", para volver arriba de la lista al cambiar de página
+  const seccionColeccion = useRef(null)
   // mensaje = { texto, tipo } donde tipo es 'exito' o 'error'
   // "mensaje" se muestra arriba, junto al formulario (agregar / editar)
   const [mensaje, setMensaje] = useState(null)
@@ -138,6 +146,33 @@ function App() {
     return coincideFiltro && coincideBusqueda
   })
 
+  // Orden alfabético por título, así cada libro siempre queda en la misma página
+  librosFiltrados.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'))
+
+  // PAGINACIÓN: se muestran de a 6 libros, dentro del filtro y la búsqueda elegidos.
+  // Si se elimina el último libro de la última página, se pasa a la página anterior.
+  const totalPaginas = Math.max(1, Math.ceil(librosFiltrados.length / LIBROS_POR_PAGINA))
+  const paginaActual = Math.min(pagina, totalPaginas)
+  const inicio = (paginaActual - 1) * LIBROS_POR_PAGINA
+  const librosDeLaPagina = librosFiltrados.slice(inicio, inicio + LIBROS_POR_PAGINA)
+
+  // Al cambiar de filtro o de búsqueda, se vuelve a la página 1
+  function cambiarFiltro(nuevoFiltro) {
+    setFiltro(nuevoFiltro)
+    setPagina(1)
+  }
+
+  function cambiarBusqueda(texto) {
+    setBusqueda(texto)
+    setPagina(1)
+  }
+
+  // Al cambiar de página, la vista vuelve al principio de "Mi colección"
+  function cambiarPagina(nuevaPagina) {
+    setPagina(nuevaPagina)
+    seccionColeccion.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <main className="pagina">
       <header className="encabezado">
@@ -179,7 +214,7 @@ function App() {
         )}
       </section>
 
-      <section className="biblioteca">
+      <section className="biblioteca" ref={seccionColeccion}>
         <div className="titulo-seccion">
           <div>
             <span className="etiqueta">TUS HISTORIAS FAVORITAS</span>
@@ -191,7 +226,7 @@ function App() {
         </div>
 
         {/* Los íconos con el conteo también funcionan como filtros */}
-        <Estadisticas libros={libros} filtro={filtro} onCambiarFiltro={setFiltro} />
+        <Estadisticas libros={libros} filtro={filtro} onCambiarFiltro={cambiarFiltro} />
 
         <input
           className="buscador"
@@ -199,7 +234,7 @@ function App() {
           placeholder="⌕ Buscar por título o autor..."
           aria-label="Buscar por título o autor"
           value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
+          onChange={(e) => cambiarBusqueda(e.target.value)}
         />
 
         {mensajeColeccion && (
@@ -218,7 +253,7 @@ function App() {
                 : 'No hay libros que coincidan con la búsqueda o el filtro.'}
             </p>
           ) : (
-            librosFiltrados.map((libro) => (
+            librosDeLaPagina.map((libro) => (
               <TarjetaLibro
                 key={libro.id}
                 libro={libro}
@@ -230,6 +265,12 @@ function App() {
             ))
           )}
         </div>
+
+        <Paginacion
+          pagina={paginaActual}
+          totalPaginas={totalPaginas}
+          onCambiarPagina={cambiarPagina}
+        />
       </section>
 
       {libroDetalle && (
