@@ -194,8 +194,9 @@ En el celular:
 
 **Capturas:**
 
-<!-- Agregar una captura de la colección con los botones de página, por ejemplo: -->
-<!-- ![Versión 5, paginación](docs/capturas/v5-paginacion.png) -->
+"Mi colección" con los botones de página (de a 6 libros, 4 páginas) y las etiquetas con los colores nuevos:
+
+![Versión 5, paginación](docs/capturas/v5-paginacion.png)
 
 ---
 
@@ -224,4 +225,6 @@ En el celular:
 
 **Capturas:**
 
-<!-- ![Versión 6, Leyendo ahora](docs/capturas/v6-leyendo-ahora.png) -->
+Apartado "Leyendo ahora" en verde oscuro, arriba de "Agregar un libro", con *Circe* de Madeline Miller:
+
+![Versión 6, Leyendo ahora](docs/capturas/v6-leyendo-ahora.png)
