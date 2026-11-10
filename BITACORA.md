@@ -229,3 +229,28 @@ En el celular:
 Apartado "Leyendo ahora" en verde oscuro, arriba de "Agregar un libro", con *Circe* de Madeline Miller:
 
 ![Versión 6, Leyendo ahora](docs/capturas/v6-leyendo-ahora.png)
+
+---
+
+## Versión 7 – La clave de Google Books pasa al servidor
+
+**Por qué:** al repasar la teoría de la materia (*Consultas a APIs en JavaScript*), vi que dice que una clave privada incluida en el JavaScript del navegador queda expuesta, *"incluso si se coloca en una variable VITE_"*, y que los secretos deben manejarse en un servidor. Mi clave de Google Books estaba justamente en `VITE_GOOGLE_BOOKS_API_KEY`: cualquiera podía verla en las herramientas del navegador de la página publicada. Estaba limitada a la Books API y a mis sitios, pero igual quedaba visible.
+
+**Qué cambió**
+- **Función del servidor `api/libros.js`.** Vercel convierte cada archivo de la carpeta `/api` en una función que corre en su servidor (serverless). La app ya no llama a Google: le pide los libros a `/api/libros?q=...` (buscar) o `/api/libros?id=...` (detalle para "Ver más"). La función agrega la clave, consulta a Google Books y devuelve solo el resultado.
+- **La clave cambió de nombre: `GOOGLE_BOOKS_API_KEY`, sin `VITE_`.** Sin ese prefijo, Vite no la incluye en el código del navegador. Está en el `.env` (que no se sube a GitHub) y en las variables de Vercel, marcada como Sensitive.
+- **`src/googleBooks.js`** ahora hace `fetch` a `/api/libros`; el resto (ordenar resultados, traducir géneros) quedó igual.
+- **`vite.config.js`:** `npm run dev` no ejecuta las funciones de Vercel, así que se agregó un pequeño complemento que, solo en la compu, responde `/api/libros` con el mismo archivo. Así se sigue probando con `npm run dev`, sin instalar nada.
+- La función solo acepta lo que la app necesita (un texto de búsqueda o un id válido) y fija ella misma los parámetros de Google, así no se puede usar para otras consultas. Además, Vercel guarda cada respuesta un día, y las búsquedas repetidas no gastan el cupo diario.
+- **En Google Cloud**, la clave quedó limitada solo a la Books API, sin restricción por sitio web: los pedidos ahora salen del servidor de Vercel, que no envía la dirección de la página.
+
+**Uso de IA:** le pregunté a Claude si mi trabajo cumplía con la teoría que nos pasó el profesor. Me marcó esta diferencia y le pedí: *"¿Podríamos hacer el cambio importante que nombrás de Google para hacerla como indica el profesor?"*. Claude armó la función del servidor y la probó con respuestas simuladas de Google (búsqueda, detalle, cupo agotado, sin conexión y datos inválidos), y comprobó que la clave ya no aparece en el código del navegador.
+
+**Pruebas**
+- [ ] En mi compu, después de renombrar la variable en `.env` y reiniciar `npm run dev`: el buscador muestra sugerencias y "Ver más" trae la sinopsis.
+- [ ] En Vercel, con la variable `GOOGLE_BOOKS_API_KEY` cargada: el buscador y "Ver más" funcionan.
+- [ ] En las herramientas del navegador (Red / Network) de la página publicada, los pedidos van a `/api/libros` y la clave no aparece.
+
+**Capturas:**
+
+<!-- ![Versión 7, pedido a /api/libros sin la clave](docs/capturas/v7-api-servidor.png) -->

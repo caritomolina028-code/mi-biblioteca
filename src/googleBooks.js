@@ -1,8 +1,11 @@
-// Todo lo que habla con la API de Google Books está en este archivo.
+// Todo lo que la app necesita de Google Books está en este archivo.
 // Documentación: https://developers.google.com/books/docs/v1/using?hl=es-419
+//
+// La app NO llama a Google directamente: le pide los datos a nuestra función
+// del servidor (/api/libros, archivo api/libros.js), que agrega la clave.
+// Así la clave de Google Books no queda en el código del navegador.
 
-const URL_BASE = 'https://www.googleapis.com/books/v1/volumes'
-const CLAVE = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
+const URL_API = '/api/libros'
 
 // Google a veces devuelve las portadas con "http://"; las pasamos a "https://".
 // También sacamos el efecto de "página doblada" (edge=curl) que agrega a algunas tapas.
@@ -116,20 +119,14 @@ function puntaje(titulo, texto) {
   }).length
 }
 
-// Hace el pedido a Google Books y devuelve la lista de libros "en crudo"
+// Le pide la búsqueda a nuestra función del servidor y devuelve la lista de libros "en crudo".
+// La función agrega la clave y los demás parámetros de Google (idioma, cantidad, campos).
 async function consultarGoogle(consulta, senal) {
-  const parametros = new URLSearchParams({
-    q: consulta,
-    langRestrict: 'es',
-    printType: 'books',
-    maxResults: '20', // pedimos más para poder filtrar y quedarnos con los mejores
-    fields: 'items(id,volumeInfo(title,authors,categories,publishedDate,imageLinks/thumbnail))',
-    key: CLAVE,
-  })
+  const parametros = new URLSearchParams({ q: consulta })
 
-  const respuesta = await fetch(`${URL_BASE}?${parametros}`, { signal: senal })
+  const respuesta = await fetch(`${URL_API}?${parametros}`, { signal: senal })
   if (!respuesta.ok) {
-    throw new Error(`Google Books respondió ${respuesta.status}`)
+    throw new Error(`La búsqueda respondió ${respuesta.status}`)
   }
 
   const datos = await respuesta.json()
@@ -186,17 +183,11 @@ export async function buscarLibros(texto, autor, senal) {
 
 // DETALLE: trae la sinopsis y otros datos de un libro por su id de Google
 export async function obtenerDetalle(googleId, senal) {
-  const parametros = new URLSearchParams({
-    fields:
-      'volumeInfo(title,authors,description,pageCount,publishedDate,publisher,categories,imageLinks/thumbnail,infoLink)',
-    key: CLAVE,
-  })
+  const parametros = new URLSearchParams({ id: googleId })
 
-  const respuesta = await fetch(`${URL_BASE}/${encodeURIComponent(googleId)}?${parametros}`, {
-    signal: senal,
-  })
+  const respuesta = await fetch(`${URL_API}?${parametros}`, { signal: senal })
   if (!respuesta.ok) {
-    throw new Error(`Google Books respondió ${respuesta.status}`)
+    throw new Error(`El detalle respondió ${respuesta.status}`)
   }
 
   const { volumeInfo = {} } = await respuesta.json()

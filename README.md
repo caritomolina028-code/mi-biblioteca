@@ -36,7 +36,7 @@ VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_APP_ID=
-VITE_GOOGLE_BOOKS_API_KEY=
+GOOGLE_BOOKS_API_KEY=
 ```
 
 5. Reiniciá `npm run dev` después de cambiar el `.env`.
@@ -46,8 +46,10 @@ VITE_GOOGLE_BOOKS_API_KEY=
 1. En [Google Cloud Console](https://console.cloud.google.com/), con el mismo proyecto de Firebase seleccionado, habilitá **Books API** (Biblioteca de APIs). No requiere facturación.
 2. En **APIs y servicios → Credenciales → Crear credenciales → Clave de API**:
    - Restricción de API: solo **Books API**.
-   - Restricción de aplicaciones: **Sitios web**, con `https://<tu-app>.vercel.app/*` y `http://localhost:5173/*` (y otros puertos que uses).
-3. Pegá la clave en `.env` como `VITE_GOOGLE_BOOKS_API_KEY`.
+   - Restricción de aplicaciones: **Ninguna**. La clave la usa la función del servidor, que no envía la dirección del sitio; lo que la protege es que nunca llega al navegador.
+3. Pegá la clave en `.env` como `GOOGLE_BOOKS_API_KEY`, **sin** el prefijo `VITE_`.
+
+**Por qué sin `VITE_`:** las variables con ese prefijo se incluyen en el JavaScript que descarga cualquier visitante. La clave de Google Books la lee solo `api/libros.js`, una función que Vercel ejecuta en su servidor: la app le pide `/api/libros?q=...` y la función consulta a Google con la clave. Con `npm run dev`, `vite.config.js` hace lo mismo en la compu, así que no hace falta instalar nada más.
 
 El cupo gratuito es de 1000 consultas por día. Si se agota o la API falla, la app sigue funcionando y se pueden cargar los libros a mano.
 
@@ -59,7 +61,7 @@ Las reglas están en `firestore.rules`. Copiá su contenido en **Firestore → R
 
 1. Importá el repositorio de GitHub en [Vercel](https://vercel.com/).
 2. Framework: **Vite**, build: `npm run build`, salida: `dist`.
-3. En **Settings → Environment Variables** cargá las 4 variables `VITE_FIREBASE_*` y `VITE_GOOGLE_BOOKS_API_KEY` (entorno Production, tipo Config).
+3. En **Settings → Environment Variables** cargá las 4 variables `VITE_FIREBASE_*` (entorno Production, tipo Config) y `GOOGLE_BOOKS_API_KEY` (entorno Production, marcada como **Sensitive**: es secreta y solo la usa el servidor).
 4. Desplegá. Si cambiás las variables, hacé **Redeploy**.
 
 ## Dónde se conectan Firebase y la API
@@ -69,7 +71,9 @@ Las reglas están en `firestore.rules`. Copiá su contenido en **Firestore → R
 | `src/firebase.js` | Inicializa Firebase con las variables del `.env` y exporta `db` y `auth`. |
 | `src/App.jsx` | Inicia la sesión anónima (`signInAnonymously`). |
 | `src/librosService.js` | Todas las operaciones con Firestore: consultar (`onSnapshot`), agregar (`addDoc`), modificar (`updateDoc`) y eliminar (`deleteDoc`). |
-| `src/googleBooks.js` | API de Google Books con `fetch`: buscar libros (`buscarLibros`) y traer el detalle con la sinopsis (`obtenerDetalle`). También traduce los géneros y ordena los resultados. |
+| `src/googleBooks.js` | Pide los datos de Google Books a `/api/libros` con `fetch`: buscar libros (`buscarLibros`) y traer el detalle con la sinopsis (`obtenerDetalle`). También traduce los géneros y ordena los resultados. |
+| `api/libros.js` | Función del servidor (Vercel): agrega la clave secreta y consulta a Google Books. La clave nunca llega al navegador. |
+| `vite.config.js` | En desarrollo (`npm run dev`), hace que `/api/libros` funcione igual que en Vercel. |
 | `firestore.rules` | Permisos de la base de datos. |
 
 ## Modelo de datos
@@ -92,15 +96,17 @@ Colección `libros`, un documento por libro:
 - Las reglas validan los campos y no permiten cambiar el dueño de un libro.
 - Todo lo que no está permitido queda bloqueado.
 - El `.env` no se sube al repositorio.
-- La clave de Google Books solo sirve para la Books API y solo desde los sitios autorizados (Vercel y localhost).
+- La clave de Google Books no está en el código del navegador: la usa solo la función del servidor (`api/libros.js`). Además, en Google Cloud está limitada a la Books API.
 
 ## Estructura
 
 ```
+api/
+  libros.js            función del servidor: consulta Google Books con la clave secreta
 src/
   firebase.js          conexión con Firebase
   librosService.js     operaciones con Firestore
-  googleBooks.js       API de Google Books (búsqueda y detalle)
+  googleBooks.js       búsqueda y detalle de libros (los pide a /api/libros)
   App.jsx              estado principal y lógica
   assets/              íconos de acuarela (hoja y libros; libros-leyendo.png armado a partir de los otros)
   components/
