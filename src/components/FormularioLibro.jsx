@@ -4,7 +4,7 @@ import { buscarLibros, obtenerDetalle } from '../googleBooks'
 // Formulario para agregar o editar un libro.
 // - Mientras se escribe el título, busca sugerencias en Google Books.
 //   Al elegir una, se completan título, autor, género y portada.
-// - Dos botones, "Quiero leer" y "Leído", guardan el libro con ese estado (un solo paso).
+// - Tres botones, "Quiero leer", "Leyendo" y "Leído", guardan el libro con ese estado (un solo paso).
 function FormularioLibro({ libroEditando, deshabilitado, onGuardar, onCancelar, onError }) {
   const [titulo, setTitulo] = useState(libroEditando?.titulo ?? '')
   const [autor, setAutor] = useState(libroEditando?.autor ?? '')
@@ -217,6 +217,14 @@ function FormularioLibro({ libroEditando, deshabilitado, onGuardar, onCancelar, 
               onClick={() => guardar('Quiero leer')}
             >
               Quiero leer
+            </button>
+            <button
+              type="button"
+              className="boton-estado leyendo"
+              disabled={bloqueado}
+              onClick={() => guardar('Leyendo')}
+            >
+              Leyendo
             </button>
             <button
               type="button"

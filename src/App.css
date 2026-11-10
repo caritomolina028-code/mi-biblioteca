@@ -128,7 +128,7 @@ button {
 /* Estadísticas: ahora son botones que filtran la colección */
 .estadisticas {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 18px;
   margin-bottom: 20px;
 }
@@ -353,7 +353,7 @@ button {
 
 .botones-estado {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
@@ -364,11 +364,18 @@ button {
   border: 2px solid transparent;
 }
 
-/* Mismos colores que las etiquetas de estado de las tarjetas */
+/* "Quiero leer": blanco con borde verde, del mismo verde que "Leído" */
 .boton-estado.quiero-leer {
-  background: #f4eadb;
-  border-color: #e3cfb3;
-  color: #7a5a33;
+  background: #fff;
+  border-color: var(--principal);
+  color: var(--principal);
+}
+
+/* "Leyendo": verde clarito, el paso intermedio entre "Quiero leer" y "Leído" */
+.boton-estado.leyendo {
+  background: var(--secundario);
+  border-color: var(--principal);
+  color: var(--principal-hover);
 }
 
 .boton-estado.leido {
@@ -378,7 +385,11 @@ button {
 
 @media (hover: hover) {
   .boton-estado.quiero-leer:hover {
-    border-color: #b8925f;
+    background: var(--secundario);
+  }
+
+  .boton-estado.leyendo:hover {
+    background: #d2e2cb;
   }
 
   .boton-estado.leido:hover {
@@ -439,11 +450,6 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-.cantidad {
-  color: var(--texto-suave);
-  font-size: 13px;
-}
-
 .buscador {
   width: 100%;
   background: var(--tarjeta);
@@ -497,16 +503,28 @@ button:focus-visible {
   font-size: 10px;
   padding: 5px 9px;
   border-radius: 20px;
+  /* borde transparente para que las dos etiquetas tengan el mismo tamaño */
+  border: 1px solid transparent;
 }
 
+/* Las etiquetas usan los mismos colores que los botones del formulario:
+   Quiero leer (blanco), Leyendo (verde clarito) y Leído (verde) */
 .estado.leido {
-  background: #e7eee2;
-  color: #627c58;
+  background: var(--principal);
+  color: #fff;
 }
 
+.estado.leyendo {
+  background: var(--secundario);
+  border-color: var(--principal);
+  color: var(--principal-hover);
+}
+
+/* "Quiero leer": blanco con borde verde, igual que el botón del formulario */
 .estado.pendiente {
-  background: #f4eadb;
-  color: #a17a4d;
+  background: #fff;
+  border-color: var(--principal);
+  color: var(--principal);
 }
 
 .datos-libro h3 {
@@ -548,6 +566,43 @@ button:focus-visible {
   padding: 30px 0;
   font-size: 14px;
   grid-column: 1 / -1;
+}
+
+/* ---------- Apartado "Leyendo ahora" (arriba de "Agregar un libro") ---------- */
+/* Panel verde oscuro (el mismo verde del botón "Leído") con tarjetas blancas,
+   para que se distinga del fondo claro y se vea como un lugar especial */
+.leyendo-ahora {
+  margin-bottom: 44px;
+  padding: 26px 28px 28px;
+  background: var(--principal);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(42, 56, 46, 0.18);
+}
+
+.leyendo-ahora .titulo-seccion {
+  margin-bottom: 18px;
+}
+
+.leyendo-ahora .etiqueta {
+  color: #cfe3c8;
+}
+
+.leyendo-ahora .titulo-seccion h2 {
+  color: #fff;
+}
+
+.leyendo-ahora .tarjeta-libro {
+  background: #fff;
+  border-color: transparent;
+}
+
+.leyendo-ahora .mensaje {
+  margin: 0 0 18px;
+}
+
+.leyendo-ahora .vacio {
+  padding: 6px 0 0;
+  color: #e4eee0;
 }
 
 /* ---------- Paginación de "Mi colección" (de a 6 libros) ---------- */
@@ -634,8 +689,19 @@ footer {
 
   /* Estadísticas compactas: ícono arriba, número y texto abajo */
   .estadisticas {
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 16px;
+  }
+
+  .leyendo-ahora {
+    padding: 18px 16px 20px;
+    margin-bottom: 36px;
+  }
+
+  /* Tres botones de estado en pantallas chicas: letra un poco más chica */
+  .boton-estado {
+    font-size: 14px;
+    padding: 0 4px;
   }
 
   .estadistica {

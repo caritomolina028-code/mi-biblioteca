@@ -8,9 +8,10 @@ Aplicación web para registrar los libros que leíste y los que querés leer. Po
 ## Cómo usarla
 
 1. Empezá a escribir el **título**: aparece una lista de libros de Google Books con su portada. Elegí el tuyo y se completan solos el autor, el género y la portada. Si hay muchos libros con títulos parecidos, escribí también el **autor**. Si no lo encontrás, completá los datos a mano.
-2. Tocá **Quiero leer** o **Leído**: el libro se guarda directamente con ese estado.
-3. En **Mi colección**, tocá los contadores (**Libros en total**, **Libros leídos**, **Por leer**) para ver solo esos libros. También podés usar el buscador.
-4. En cada tarjeta podés tocar **Ver más** (sinopsis, año, editorial y páginas, si el libro vino de Google Books), **marcar como leído / pendiente**, **editar** o **eliminar**.
+2. Tocá **Quiero leer**, **Leyendo** o **Leído**: el libro se guarda directamente con ese estado.
+3. Los libros que estás leyendo aparecen arriba de todo, en **Leyendo ahora**, apenas entrás a la página.
+4. En **Mi colección**, tocá los contadores (**Libros en total**, **Por leer**, **Leyendo**, **Libros leídos**) para ver solo esos libros. También podés usar el buscador. La colección muestra 6 libros por página, en orden alfabético.
+5. En cada tarjeta podés tocar **Ver más** (sinopsis, año, editorial y páginas, si el libro vino de Google Books), **Empezar a leer**, **Marcar como leído** o **Marcar como pendiente** (según el estado del libro), **Editar** o **Eliminar**.
 
 Cada navegador recibe un usuario anónimo propio: tus libros se guardan en Firebase y siguen ahí al recargar, pero desde otro dispositivo verías una biblioteca distinta.
 
@@ -80,7 +81,7 @@ Colección `libros`, un documento por libro:
 | `titulo` | texto (1 a 100) | "El principito" |
 | `autor` | texto (1 a 100) | "Antoine de Saint-Exupéry" |
 | `genero` | texto (hasta 50) | "Clásico" |
-| `estado` | "Leído" o "Quiero leer" | "Leído" |
+| `estado` | "Quiero leer", "Leyendo" o "Leído" | "Leyendo" |
 | `ownerId` | texto | uid del usuario anónimo |
 | `portada` | texto `https://` (opcional) | imagen de tapa de Google Books |
 | `googleId` | texto (opcional) | id del libro en Google Books |
@@ -101,12 +102,13 @@ src/
   librosService.js     operaciones con Firestore
   googleBooks.js       API de Google Books (búsqueda y detalle)
   App.jsx              estado principal y lógica
-  assets/              íconos de acuarela (hoja y libros)
+  assets/              íconos de acuarela (hoja y libros; libros-leyendo.png armado a partir de los otros)
   components/
     Estadisticas.jsx   contadores de libros (también filtran la colección)
     FormularioLibro.jsx  formulario para agregar/editar
     TarjetaLibro.jsx   tarjeta de cada libro
     DetalleLibro.jsx   ventana "Ver más" con la sinopsis
+    Paginacion.jsx     botones de página de "Mi colección" (de a 6 libros)
 docs/capturas/         capturas de cada versión
 firestore.rules        reglas de seguridad
 ```

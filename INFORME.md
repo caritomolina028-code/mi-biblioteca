@@ -18,12 +18,14 @@ Mi biblioteca es una aplicación para personas a las que les gusta leer. Sirve p
 
 ## Funciones implementadas
 
-- Agregar un libro con título, autor y género, guardándolo en un solo paso con los botones "Quiero leer" o "Leído".
+- Agregar un libro con título, autor y género, guardándolo en un solo paso con los botones "Quiero leer", "Leyendo" o "Leído".
+- **"Leyendo ahora":** apartado arriba de todo, lo primero que se ve al entrar, con los libros que se están leyendo.
 - **Buscar el libro en Google Books mientras se escribe el título** (y el autor, si hay muchos títulos parecidos): al elegirlo de la lista se completan solos el título, el autor, el género (traducido al español) y la portada.
 - **Portadas reales** en las tarjetas de los libros elegidos desde Google Books.
 - **"Ver más":** ventana con la sinopsis, el año, la editorial y las páginas del libro, pedidos a Google Books en el momento.
-- Ver la colección, con contadores de libros totales, leídos y por leer. Los contadores también funcionan como filtros: al tocarlos se ven solo esos libros.
-- Marcar un libro como leído o pendiente.
+- Ver la colección, con contadores de libros totales, por leer, leyendo y leídos. Los contadores también funcionan como filtros: al tocarlos se ven solo esos libros.
+- **Paginación:** la colección muestra 6 libros por página, en orden alfabético, dentro del filtro y la búsqueda elegidos.
+- Cambiar el estado de un libro siguiendo el recorrido de una lectura: "Empezar a leer", "Marcar como leído" o "Marcar como pendiente".
 - Editar los datos de un libro.
 - Eliminar un libro (con confirmación).
 - Buscar por título o autor.
@@ -32,7 +34,7 @@ Mi biblioteca es una aplicación para personas a las que les gusta leer. Sirve p
 
 ## Información guardada en Firebase
 
-Colección `libros` en Cloud Firestore. Cada documento tiene `titulo`, `autor`, `genero`, `estado` y `ownerId` (el identificador del usuario anónimo). Si el libro se eligió desde Google Books, también guarda `portada` (la dirección de la imagen de tapa) y `googleId` (el identificador del libro en Google Books, que se usa para pedir la sinopsis en "Ver más"). Las reglas de Firestore hacen que cada usuario solo pueda ver y modificar sus propios libros, validan cada campo y no permiten agregar campos que no estén en esta lista.
+Colección `libros` en Cloud Firestore. Cada documento tiene `titulo`, `autor`, `genero`, `estado` ("Quiero leer", "Leyendo" o "Leído") y `ownerId` (el identificador del usuario anónimo). Si el libro se eligió desde Google Books, también guarda `portada` (la dirección de la imagen de tapa) y `googleId` (el identificador del libro en Google Books, que se usa para pedir la sinopsis en "Ver más"). Las reglas de Firestore hacen que cada usuario solo pueda ver y modificar sus propios libros, validan cada campo y no permiten agregar campos que no estén en esta lista.
 
 ## API externa: Google Books
 

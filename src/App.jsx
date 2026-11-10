@@ -35,15 +35,17 @@ function App() {
   // mensaje = { texto, tipo } donde tipo es 'exito' o 'error'
   // "mensaje" se muestra arriba, junto al formulario (agregar / editar)
   const [mensaje, setMensaje] = useState(null)
-  // "mensajeColeccion" se muestra abajo, en "Mi colección" (eliminar / cambiar estado)
-  const [mensajeColeccion, setMensajeColeccion] = useState(null)
+  // "aviso" es el mensaje de las acciones de las tarjetas (eliminar / cambiar estado).
+  // aviso = { texto, tipo, lugar }: lugar es 'lectura' (sección "Leyendo ahora")
+  // o 'coleccion' ("Mi colección"), así aparece donde se hizo la acción.
+  const [aviso, setAviso] = useState(null)
   const temporizadorMensaje = useRef(null)
 
-  // Muestra un mensaje en la colección y lo oculta solo después de 4 segundos
-  function avisarEnColeccion(texto, tipo) {
+  // Muestra el aviso y lo oculta solo después de 4 segundos
+  function avisar(lugar, texto, tipo) {
     clearTimeout(temporizadorMensaje.current)
-    setMensajeColeccion({ texto, tipo })
-    temporizadorMensaje.current = setTimeout(() => setMensajeColeccion(null), 4000)
+    setAviso({ texto, tipo, lugar })
+    temporizadorMensaje.current = setTimeout(() => setAviso(null), 4000)
   }
 
   // Al cerrar la app, cancelamos el temporizador del mensaje
@@ -105,28 +107,28 @@ function App() {
     }
   }
 
-  // MODIFICAR solo el estado (Leído / Quiero leer)
-  async function cambiarEstado(libro) {
-    const nuevoEstado = libro.estado === 'Leído' ? 'Quiero leer' : 'Leído'
+  // MODIFICAR solo el estado (Quiero leer / Leyendo / Leído).
+  // La tarjeta indica a qué estado pasa el libro y desde qué sección se tocó.
+  async function cambiarEstado(libro, nuevoEstado, lugar) {
     try {
       await actualizarLibro(libro.id, { estado: nuevoEstado })
-      avisarEnColeccion(`Marcado como "${nuevoEstado}".`, 'exito')
+      avisar(lugar, `"${libro.titulo}" ahora está en "${nuevoEstado}".`, 'exito')
     } catch (error) {
       console.error(error)
-      avisarEnColeccion('No se pudo actualizar el estado.', 'error')
+      avisar(lugar, 'No se pudo actualizar el estado.', 'error')
     }
   }
 
   // ELIMINAR
-  async function borrarLibro(libro) {
+  async function borrarLibro(libro, lugar) {
     if (!window.confirm(`¿Querés eliminar "${libro.titulo}"?`)) return
     try {
       await eliminarLibro(libro.id)
       // En rojo, para que se note que el libro se borró
-      avisarEnColeccion(`"${libro.titulo}" se eliminó de tu colección.`, 'eliminado')
+      avisar(lugar, `"${libro.titulo}" se eliminó de tu colección.`, 'eliminado')
     } catch (error) {
       console.error(error)
-      avisarEnColeccion('No se pudo eliminar el libro.', 'error')
+      avisar(lugar, 'No se pudo eliminar el libro.', 'error')
     }
   }
 
@@ -135,6 +137,14 @@ function App() {
     setMensaje(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  // LEYENDO AHORA: los libros que se están leyendo, ordenados por título.
+  // La sección aparece arriba de todo solo si hay alguno (o mientras se muestra
+  // un aviso de esa sección, por ejemplo al terminar el último libro).
+  const librosLeyendo = libros
+    .filter((libro) => libro.estado === 'Leyendo')
+    .sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'))
+  const mostrarLeyendo = !cargando && (librosLeyendo.length > 0 || aviso?.lugar === 'lectura')
 
   // Filtro por estado + búsqueda por título o autor (se hace en el navegador)
   const textoBuscado = busqueda.toLowerCase()
@@ -189,6 +199,41 @@ function App() {
         <p>Guardá cada historia que te acompaña y cada aventura que está por comenzar.</p>
       </section>
 
+      {/* Apartado especial: lo primero que se ve al entrar son los libros que se están leyendo */}
+      {mostrarLeyendo && (
+        <section className="leyendo-ahora" aria-labelledby="titulo-leyendo">
+          <div className="titulo-seccion">
+            <div>
+              <span className="etiqueta">TU LECTURA ACTUAL</span>
+              <h2 id="titulo-leyendo">Leyendo ahora</h2>
+            </div>
+          </div>
+
+          {aviso?.lugar === 'lectura' && (
+            <p className={`mensaje ${aviso.tipo}`} role="status">
+              {aviso.texto}
+            </p>
+          )}
+
+          {librosLeyendo.length > 0 ? (
+            <div className="lista-libros">
+              {librosLeyendo.map((libro) => (
+                <TarjetaLibro
+                  key={libro.id}
+                  libro={libro}
+                  onCambiarEstado={(l, estado) => cambiarEstado(l, estado, 'lectura')}
+                  onEditar={empezarEdicion}
+                  onEliminar={(l) => borrarLibro(l, 'lectura')}
+                  onVerDetalle={setLibroDetalle}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="vacio">No estás leyendo ningún libro en este momento.</p>
+          )}
+        </section>
+      )}
+
       <section className="formulario-seccion">
         <div className="titulo-seccion">
           <div>
@@ -220,9 +265,6 @@ function App() {
             <span className="etiqueta">TUS HISTORIAS FAVORITAS</span>
             <h2>Mi colección</h2>
           </div>
-          <span className="cantidad">
-            {libros.length} {libros.length === 1 ? 'libro' : 'libros'}
-          </span>
         </div>
 
         {/* Los íconos con el conteo también funcionan como filtros */}
@@ -237,9 +279,9 @@ function App() {
           onChange={(e) => cambiarBusqueda(e.target.value)}
         />
 
-        {mensajeColeccion && (
-          <p className={`mensaje ${mensajeColeccion.tipo}`} role="status">
-            {mensajeColeccion.texto}
+        {aviso?.lugar === 'coleccion' && (
+          <p className={`mensaje ${aviso.tipo}`} role="status">
+            {aviso.texto}
           </p>
         )}
 
@@ -257,9 +299,9 @@ function App() {
               <TarjetaLibro
                 key={libro.id}
                 libro={libro}
-                onCambiarEstado={cambiarEstado}
+                onCambiarEstado={(l, estado) => cambiarEstado(l, estado, 'coleccion')}
                 onEditar={empezarEdicion}
-                onEliminar={borrarLibro}
+                onEliminar={(l) => borrarLibro(l, 'coleccion')}
                 onVerDetalle={setLibroDetalle}
               />
             ))

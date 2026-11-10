@@ -179,6 +179,7 @@ En el celular:
 - Al cambiar de página, la vista sube al principio de "Mi colección".
 - Si se elimina el último libro de la última página, la app pasa sola a la página anterior en lugar de quedar en una página vacía.
 - **Diseño:** la página que se está viendo queda marcada en verde, igual que el contador elegido, para que se entienda que funcionan de la misma manera. En el celular, los números quedan arriba y "Anterior" y "Siguiente" abajo, a los costados, para que se puedan tocar con el dedo.
+- Se sacó el contador chico que estaba al lado del título "Mi colección" ("11 libros"): repetía lo mismo que el contador grande "Libros en total" que está justo abajo.
 - El código de los botones quedó en un componente nuevo, `src/components/Paginacion.jsx`; la lógica (qué libros van en cada página) está en `src/App.jsx`. No hizo falta cambiar Firestore ni las reglas: la paginación se hace en el navegador con los libros que ya se consultan.
 
 **Uso de IA:** le pedí a Claude: *"Ahora sumé varios libros, pero la hoja se sigue haciendo cada vez más larga. ¿Es posible hacer varias páginas de los libros? Que muestre de a 6 libros por cada filtro."* Claude programó la paginación y la probó con 12 libros de prueba: 6 por página, cambio de filtro y búsqueda, eliminación en la última página y vista en celular.
@@ -195,3 +196,32 @@ En el celular:
 
 <!-- Agregar una captura de la colección con los botones de página, por ejemplo: -->
 <!-- ![Versión 5, paginación](docs/capturas/v5-paginacion.png) -->
+
+---
+
+## Versión 6 – Estado "Leyendo" y apartado "Leyendo ahora"
+
+**Por qué:** solo había dos estados, "Quiero leer" y "Leído", pero faltaba el momento intermedio: el libro que se está leyendo. Es el que más se usa en el día a día, así que quise que tuviera un lugar especial y fuera lo primero que se ve al entrar.
+
+**Qué cambió**
+- **Nuevo estado "Leyendo".** En "Agregar un libro" hay un tercer botón: **Quiero leer · Leyendo · Leído**, en el orden en que avanza una lectura.
+- **Apartado "Leyendo ahora", arriba de "Agregar un libro":** al entrar a la página, lo primero que aparece son los libros que se están leyendo, dentro de un panel verde oscuro (el mismo verde del botón "Leído") con las tarjetas en blanco. Primero lo hice verde clarito, pero se confundía con el fondo de acuarela; con el verde oscuro se distingue enseguida y se ve como un lugar especial. Si no hay ninguno, el apartado no se muestra, así el formulario sigue quedando arriba.
+- **Cuarto contador en "Mi colección":** Libros en total · Por leer · Leyendo · Libros leídos. Igual que los otros, también funciona como filtro. Para su ícono usé los mismos libros de acuarela del contador "Por leer", con el círculo verde del ícono "Leídos", pero con tres puntos (en curso) en lugar del tilde.
+- **Acciones de las tarjetas según el estado:** un libro "Quiero leer" muestra **Empezar a leer** y **Marcar como leído**; uno "Leyendo" muestra **Marcar como leído**; uno "Leído" muestra **Marcar como pendiente**.
+- **Colores de los estados**, iguales en los botones del formulario y en las etiquetas de las tarjetas: Quiero leer (blanco con borde verde), Leyendo (verde clarito con borde verde) y Leído (verde con letras blancas). Van de más claro a más oscuro, como el avance de la lectura.
+- Los avisos aparecen donde se hizo la acción: si se marca un libro como leído desde "Leyendo ahora", el aviso se ve ahí; si se hace desde "Mi colección", abajo.
+- **Reglas de Firestore:** el campo `estado` ahora acepta "Quiero leer", "Leyendo" o "Leído". Las reglas nuevas hay que publicarlas en Firebase (Firestore → Reglas), porque Vercel no las actualiza.
+
+**Uso de IA:** le pedí a Claude: *"Quiero sumar una categoría más que es 'Leyendo'. Debería haber otro botón en la parte de agregar un libro para poder elegir esa opción. Y además quiero que los libros que agregue a esa categoría tengan un apartado especial apenas entro, arriba de agregar un libro."* Claude hizo los cambios en el código y en las reglas, y los probó con libros de prueba: agregar con "Leyendo", empezar a leer desde la colección, terminar un libro desde "Leyendo ahora", el filtro nuevo y la vista en celular.
+
+**Pruebas**
+- [ ] Publicar las reglas nuevas en Firebase y agregar un libro con el botón "Leyendo": aparece en "Leyendo ahora" y en Firestore figura `estado: "Leyendo"`.
+- [ ] "Empezar a leer" en un libro pendiente lo pasa a "Leyendo ahora".
+- [ ] "Marcar como leído" desde "Leyendo ahora" lo saca del apartado.
+- [ ] El contador "Leyendo" filtra bien la colección.
+- [ ] En la URL de Vercel, después del commit, todo funciona igual.
+- [ ] En el celular se ve bien.
+
+**Capturas:**
+
+<!-- ![Versión 6, Leyendo ahora](docs/capturas/v6-leyendo-ahora.png) -->
