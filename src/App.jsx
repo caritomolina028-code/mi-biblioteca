@@ -194,7 +194,6 @@ function App() {
       </header>
 
       <section className="presentacion">
-        <p className="subtitulo">TU ESPACIO DE LECTURA</p>
         <h1>Mis libros, mi historia.</h1>
         <p>Guardá cada historia que te acompaña y cada aventura que está por comenzar.</p>
       </section>
@@ -237,7 +236,6 @@ function App() {
       <section className="formulario-seccion">
         <div className="titulo-seccion">
           <div>
-            <span className="etiqueta">TU COLECCIÓN</span>
             <h2>{libroEditando ? 'Editar libro' : 'Agregar un libro'}</h2>
           </div>
         </div>
@@ -262,7 +260,6 @@ function App() {
       <section className="biblioteca" ref={seccionColeccion}>
         <div className="titulo-seccion">
           <div>
-            <span className="etiqueta">TUS HISTORIAS FAVORITAS</span>
             <h2>Mi colección</h2>
           </div>
         </div>

@@ -185,8 +185,8 @@ En el celular:
 **Uso de IA:** le pedí a Claude: *"Ahora sumé varios libros, pero la hoja se sigue haciendo cada vez más larga. ¿Es posible hacer varias páginas de los libros? Que muestre de a 6 libros por cada filtro."* Claude programó la paginación y la probó con 12 libros de prueba: 6 por página, cambio de filtro y búsqueda, eliminación en la última página y vista en celular.
 
 **Pruebas**
-- [ ] En mi compu (`npm run dev`), con mis libros cargados: aparecen las páginas de a 6 y los botones funcionan.
-- [ ] Los contadores ("Libros en total", "Libros leídos", "Por leer") y el buscador muestran las páginas correctas.
+- [x] En mi compu (`npm run dev`), con mis libros cargados: aparecen las páginas de a 6 y los botones funcionan.
+- [x] Los contadores ("Libros en total", "Libros leídos", "Por leer") y el buscador muestran las páginas correctas.
 - [ ] En la URL de Vercel, después del commit "version5", la paginación funciona igual.
 - [ ] En el celular, los botones se ven y se pueden tocar bien.
 
@@ -211,15 +211,16 @@ En el celular:
 - **Acciones de las tarjetas según el estado:** un libro "Quiero leer" muestra **Empezar a leer** y **Marcar como leído**; uno "Leyendo" muestra **Marcar como leído**; uno "Leído" muestra **Marcar como pendiente**.
 - **Colores de los estados**, iguales en los botones del formulario y en las etiquetas de las tarjetas: Quiero leer (blanco con borde verde), Leyendo (verde clarito con borde verde) y Leído (verde con letras blancas). Van de más claro a más oscuro, como el avance de la lectura.
 - Los avisos aparecen donde se hizo la acción: si se marca un libro como leído desde "Leyendo ahora", el aviso se ve ahí; si se hace desde "Mi colección", abajo.
+- Se sacaron las etiquetas chicas en mayúscula que estaban arriba de los títulos ("TU ESPACIO DE LECTURA", "TU COLECCIÓN" y "TUS HISTORIAS FAVORITAS"): no agregaban información y recargaban la página. Solo quedó "TU LECTURA ACTUAL", que identifica el apartado especial.
 - **Reglas de Firestore:** el campo `estado` ahora acepta "Quiero leer", "Leyendo" o "Leído". Las reglas nuevas hay que publicarlas en Firebase (Firestore → Reglas), porque Vercel no las actualiza.
 
 **Uso de IA:** le pedí a Claude: *"Quiero sumar una categoría más que es 'Leyendo'. Debería haber otro botón en la parte de agregar un libro para poder elegir esa opción. Y además quiero que los libros que agregue a esa categoría tengan un apartado especial apenas entro, arriba de agregar un libro."* Claude hizo los cambios en el código y en las reglas, y los probó con libros de prueba: agregar con "Leyendo", empezar a leer desde la colección, terminar un libro desde "Leyendo ahora", el filtro nuevo y la vista en celular.
 
 **Pruebas**
-- [ ] Publicar las reglas nuevas en Firebase y agregar un libro con el botón "Leyendo": aparece en "Leyendo ahora" y en Firestore figura `estado: "Leyendo"`.
-- [ ] "Empezar a leer" en un libro pendiente lo pasa a "Leyendo ahora".
-- [ ] "Marcar como leído" desde "Leyendo ahora" lo saca del apartado.
-- [ ] El contador "Leyendo" filtra bien la colección.
+- [x] Publicar las reglas nuevas en Firebase y agregar un libro con el botón "Leyendo": aparece en "Leyendo ahora" y en Firestore figura `estado: "Leyendo"`.
+- [x] "Empezar a leer" en un libro pendiente lo pasa a "Leyendo ahora".
+- [x] "Marcar como leído" desde "Leyendo ahora" lo saca del apartado.
+- [x] El contador "Leyendo" filtra bien la colección.
 - [ ] En la URL de Vercel, después del commit, todo funciona igual.
 - [ ] En el celular se ve bien.
 
